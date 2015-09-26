@@ -1,24 +1,37 @@
 package com.focusandcode.popularmovies;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.Arrays;
 
 /**
  * Created by Moise2022 on 9/23/15.
  */
 public class Movie {
+    @SerializedName("adult")
     private boolean isAdult;
+    @SerializedName("backdrop_path")
     private String backdropPath;
+    @SerializedName("genre_ids")
     private int[] genreIds;
+    @SerializedName("id")
     private int id;
+    @SerializedName("original_language")
     private String originalLanguage;
+    @SerializedName("original_title")
     private String originalTitle;
     private String overview;
+    @SerializedName("release_date")
     private String releaseDate;
+    @SerializedName("poster_path")
     private String posterPath;
     private double popularity;
     private String title;
+    @SerializedName("video")
     private boolean isVideo;
+    @SerializedName("vote_average")
     private double voteAverage;
+    @SerializedName("vote_count")
     private int voteCount;
 
     public boolean isAdult() {

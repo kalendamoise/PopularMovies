@@ -5,13 +5,20 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.GridView;
+import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private static final String LOG_TAG = MainActivity.class.getName();
+    private GridViewAdapter adapter;
+    private List<Movie> movies = new ArrayList<Movie>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,6 +27,13 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        adapter = new GridViewAdapter(this, movies);
+        GridView gridview = (GridView) findViewById(R.id.gridview);
+        gridview.setAdapter(adapter);
+
+
+        FetchMovieTask task = new FetchMovieTask(adapter);
+        task.execute(Constants.SORT_BY_POPULARITY_DESC, Constants.API_KEY);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -27,12 +41,20 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
-                FetchMovieTask task = new FetchMovieTask();
-                task.execute("0");
-                Log.d(LOG_TAG, task.getMovies().toString());
+
+                FetchMovieTask task = new FetchMovieTask(adapter);
+                task.execute(Constants.SORT_BY_POPULARITY_DESC, Constants.API_KEY);
             }
         });
 
+
+        gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View v,
+                                    int position, long id) {
+                Toast.makeText(MainActivity.this, "" + position,
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override

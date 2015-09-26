@@ -26,14 +26,10 @@ import java.util.List;
 public class FetchMovieTask  extends AsyncTask<String, Void, List<Movie>> {
 
     private final String LOG_TAG = FetchMovieTask.class.getSimpleName();
-    private List<Movie> movies = new ArrayList<Movie>();
+    private GridViewAdapter adapter;
 
-    public List<Movie> getMovies() {
-        return movies;
-    }
-
-    private void setMovies(List<Movie> movies) {
-        this.movies = movies;
+    FetchMovieTask(GridViewAdapter adapter) {
+        this.adapter = adapter;
     }
 
     private List<Movie> getMovieDataFromJson(String forecastJsonStr, int numDays)
@@ -79,15 +75,14 @@ public class FetchMovieTask  extends AsyncTask<String, Void, List<Movie>> {
             final String MOVIE_DB_BASE_URL =
                     "http://api.themoviedb.org/3/discover/movie?";
 
-            final String QUERY_PARAM = "q";
             final String SORT_ORDER_PARAM = "sort_by";
             final String API_KEY_PARAM = "api_key";
 
 
             Uri builtUri = Uri.parse(MOVIE_DB_BASE_URL).buildUpon()
                     //.appendQueryParameter(QUERY_PARAM, params[0])
-                    .appendQueryParameter(SORT_ORDER_PARAM, "popularity.desc")
-
+                    .appendQueryParameter(SORT_ORDER_PARAM, params[0])
+                    .appendQueryParameter(API_KEY_PARAM, params[1])
                     .build();
 
             URL url = new URL(builtUri.toString());
@@ -151,14 +146,11 @@ public class FetchMovieTask  extends AsyncTask<String, Void, List<Movie>> {
     }
 
     @Override
-    protected void onPostExecute(List<Movie> result) {
-        if (result != null) {
-            setMovies(result);
-//            mForecastAdapter.clear();
-//            for(String dayForecastStr : result) {
-//                mForecastAdapter.add(dayForecastStr);
-//            }
-//            // New data is back from the server.  Hooray!
+    protected void onPostExecute(List<Movie> results) {
+        if (results != null) {
+            adapter.getMovies().clear();
+            adapter.getMovies().addAll(results);
+            adapter.notifyDataSetChanged();
         }
     }
 }
