@@ -1,6 +1,9 @@
 package com.focusandcode.popularmovies;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -27,13 +30,12 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        adapter = new GridViewAdapter(this, movies);
+        adapter = new GridViewAdapter(this,R.layout.gridview_layout, movies);
         GridView gridview = (GridView) findViewById(R.id.gridview);
         gridview.setAdapter(adapter);
 
 
-        FetchMovieTask task = new FetchMovieTask(adapter);
-        task.execute(Constants.SORT_BY_POPULARITY_DESC, Constants.API_KEY);
+        fetchdata();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -42,8 +44,7 @@ public class MainActivity extends AppCompatActivity {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
 
-                FetchMovieTask task = new FetchMovieTask(adapter);
-                task.execute(Constants.SORT_BY_POPULARITY_DESC, Constants.API_KEY);
+                fetchdata();
             }
         });
 
@@ -53,8 +54,30 @@ public class MainActivity extends AppCompatActivity {
                                     int position, long id) {
                 Toast.makeText(MainActivity.this, "" + position,
                         Toast.LENGTH_SHORT).show();
+
+                Movie item = (Movie) parent.getItemAtPosition(position);
+                Intent intent = new Intent(MainActivity.this, DetailActivity.class);
+                intent.putExtra("title", item.getTitle());
+                intent.putExtra("image", item.getPosterPath());
+
+                //Start details activity
+                startActivity(intent);
+
             }
         });
+    }
+
+    private void fetchdata() {
+        SharedPreferences sharedPrefs =
+                PreferenceManager.getDefaultSharedPreferences(this);
+        String sortOrder = sharedPrefs.getString(
+                getString(R.string.pref_title_sort_order),
+                getString(R.string.pref_sort_order_default));
+
+        FetchMovieTask task = new FetchMovieTask(adapter);
+        task.execute(sortOrder, Constants.API_KEY);
+        adapter.notifyDataSetChanged();
+
     }
 
     @Override
@@ -73,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            startActivity(new Intent(this, SettingsActivity.class));
             return true;
         }
 

@@ -79,6 +79,8 @@ public class FetchMovieTask  extends AsyncTask<String, Void, List<Movie>> {
             final String API_KEY_PARAM = "api_key";
 
 
+
+
             Uri builtUri = Uri.parse(MOVIE_DB_BASE_URL).buildUpon()
                     //.appendQueryParameter(QUERY_PARAM, params[0])
                     .appendQueryParameter(SORT_ORDER_PARAM, params[0])

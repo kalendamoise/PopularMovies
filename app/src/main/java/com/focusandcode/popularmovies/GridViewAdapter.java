@@ -1,12 +1,14 @@
 package com.focusandcode.popularmovies;
 
+import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.GridView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
@@ -15,59 +17,73 @@ import java.util.List;
 /**
  * Created by Moise2022 on 9/25/15.
  */
-public class GridViewAdapter  extends BaseAdapter {
+public class GridViewAdapter  extends ArrayAdapter<Movie> {
     private static final String LOG_TAG = GridViewAdapter.class.getName();
 
     private List<Movie> movies;
     private Context context;
+    private int layoutResourceId;
 
-    public GridViewAdapter(Context context, List<Movie> movies) {
+    public GridViewAdapter(Context context, int layoutResourceId, List<Movie> movies) {
+        super(context, layoutResourceId, movies);
         this.context = context;
         this.movies = movies;
+        this.layoutResourceId = layoutResourceId;
     }
 
-
-    @Override
-    public int getCount() {
-        return movies != null ? movies.size() : 0;
-    }
-
-    @Override
-    public Object getItem(int position) {
-        return movies != null && movies.size() > position ? movies.get(position) : null;
-    }
-
-    @Override
-    public long getItemId(int position) {
-        return 0;
-    }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ImageView imageView;
-        if (convertView == null) {
-            // if it's not recycled, initialize some attributes
-            imageView = new ImageView(context);
-            imageView.setLayoutParams(new GridView.LayoutParams(525, 800));
-            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            imageView.setPadding(0, 0, 0, 0);
+//        ImageView imageView;
+//        if (convertView == null) {
+//            // if it's not recycled, initialize some attributes
+//            imageView = new ImageView(context);
+//            imageView.setLayoutParams(new GridView.LayoutParams(525, 800));
+//            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+//            imageView.setPadding(0, 0, 0, 0);
+//        } else {
+//            imageView = (ImageView) convertView;
+//        }
+//
+//
+//        if (getItem(position) != null) {
+//
+//            if (imageView != null) {
+//                String uri = Constants.IMAGE_BASE_URL + "/" + Constants.IMAGE_SIZE + "/" + ((Movie)getItem(position)).getPosterPath();
+//
+//                Picasso.with(context).load(uri)
+//                        .into(imageView);
+//                Log.d(LOG_TAG, "done updating the image view for: " + uri);
+//            }
+//        }
+//
+//        return imageView;
+
+        View row = convertView;
+        ViewHolder holder = null;
+
+        if (row == null) {
+            LayoutInflater inflater = ((Activity) context).getLayoutInflater();
+            row = inflater.inflate(layoutResourceId, parent, false);
+            holder = new ViewHolder();
+            holder.imageTitle = (TextView) row.findViewById(R.id.title);
+            holder.image = (ImageView) row.findViewById(R.id.imageView);
+            row.setTag(holder);
         } else {
-            imageView = (ImageView) convertView;
+            holder = (ViewHolder) row.getTag();
         }
 
+        Movie movie = (Movie) getItem(position);
+        if (movie != null) {
 
-        if (getItem(position) != null) {
-
-            if (imageView != null) {
-                String uri = Constants.IMAGE_BASE_URL + "/" + Constants.IMAGE_SIZE + "/" + ((Movie)getItem(position)).getPosterPath();
-
-                Picasso.with(context).load(uri)
-                        .into(imageView);
-                Log.d(LOG_TAG, "done updating the image view for: " + uri);
+            String uri = Constants.IMAGE_BASE_URL + "/" + Constants.IMAGE_SIZE + "/" + movie.getPosterPath();
+            if (holder.image != null) {
+                Picasso.with(context).load(uri).into(holder.image);
+                holder.imageTitle.setText(movie.getTitle());
             }
         }
 
-        return imageView;
+        return row;
     }
 
 
@@ -78,5 +94,10 @@ public class GridViewAdapter  extends BaseAdapter {
     public void setMovies(List<Movie> movies) {
         this.movies = movies;
         Log.d( LOG_TAG, "Init movies");
+    }
+
+    static class ViewHolder {
+        TextView imageTitle;
+        ImageView image;
     }
 }
