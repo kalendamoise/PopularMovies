@@ -1,5 +1,8 @@
 package com.focusandcode.popularmovies;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.SerializedName;
 
 import java.util.Arrays;
@@ -7,7 +10,23 @@ import java.util.Arrays;
 /**
  * Created by Moise2022 on 9/23/15.
  */
-public class Movie {
+public class Movie implements Parcelable{
+    public static String KEY_ID = "id";
+    public static String KEY_IS_ADULT = "isAdult";
+    public static String KEY_BACKDROP_PATH = "backdropPath";
+    public static String KEY_GENRE_IDS = "genreIds";
+    public static String KEY_ORIGINAL_LANG = "originalLanguage";
+    public static String KEY_ORIGINAL_TITLE = "originalTitle";
+    public static String KEY_OVERVIEW = "overview";
+    public static String KEY_RELEASE_DATE = "releaseDate";
+    public static String KEY_POSTER_PATH = "posterPath";
+    public static String KEY_POPULARITY = "popularity";
+    public static String KEY_TITLE = "title";
+    public static String KEY_IS_VIDEO = "isVideo";
+    public static String KEY_VOTE_AVERAGE = "voteAverage";
+    public static String KEY_VOTE_COUNT = "voteCount";
+
+
     @SerializedName("adult")
     private boolean isAdult;
     @SerializedName("backdrop_path")
@@ -165,4 +184,61 @@ public class Movie {
                 ", voteCount=" + voteCount +
                 '}';
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeByte((byte) (isAdult ? 1 : 0));
+        dest.writeString(backdropPath);
+        dest.writeIntArray(genreIds);
+        dest.writeInt(id);
+        dest.writeString(originalLanguage);
+        dest.writeString(originalTitle);
+        dest.writeString(overview);
+        dest.writeString(releaseDate);
+        dest.writeString(posterPath);
+        dest.writeDouble(popularity);
+        dest.writeString(title);
+        dest.writeByte((byte) (isVideo ? 1 : 0));
+        dest.writeDouble(voteAverage);
+        dest.writeInt(voteCount);
+    }
+
+    public Movie(Parcel in) {
+        this.isAdult =  in.readByte() != 0;
+        this.backdropPath = in.readString();
+        this.genreIds =  in.createIntArray();
+        this.id = in.readInt();
+        this.originalLanguage = in.readString();
+        this.originalTitle = in.readString();
+        this.overview = in.readString();
+        this.releaseDate = in.readString();
+        this.posterPath = in.readString();
+        this.popularity = in.readDouble();
+        this.title = in.readString();
+        this.isVideo = in.readByte() != 0;
+        this.voteAverage = in.readDouble();
+        this.voteCount = in.readInt();
+    }
+
+    /**
+     * Creator required for class implementing the parcelable interface.
+     */
+    public static final Parcelable.Creator<Movie> CREATOR = new Creator<Movie>() {
+
+        @Override
+        public Movie createFromParcel(Parcel source) {
+            return new Movie(source);
+        }
+
+        @Override
+        public Movie[] newArray(int size) {
+            return new Movie[size];
+        }
+
+    };
 }

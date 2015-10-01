@@ -8,12 +8,12 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String LOG_TAG = MainActivity.class.getName();
     private GridViewAdapter adapter;
     private List<Movie> movies = new ArrayList<Movie>();
+    private SharedPreferences preferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,27 +53,28 @@ public class MainActivity extends AppCompatActivity {
         gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
-                Toast.makeText(MainActivity.this, "" + position,
-                        Toast.LENGTH_SHORT).show();
 
                 Movie item = (Movie) parent.getItemAtPosition(position);
+                Log.d(LOG_TAG, item.toString());
                 Intent intent = new Intent(MainActivity.this, DetailActivity.class);
-                intent.putExtra("title", item.getTitle());
-                intent.putExtra("image", item.getPosterPath());
-
-                //Start details activity
+                intent.putExtra("movie", item);
                 startActivity(intent);
 
             }
         });
+
+        preferences =  PreferenceManager.getDefaultSharedPreferences(this);
     }
 
     private void fetchdata() {
-        SharedPreferences sharedPrefs =
-                PreferenceManager.getDefaultSharedPreferences(this);
-        String sortOrder = sharedPrefs.getString(
-                getString(R.string.pref_title_sort_order),
-                getString(R.string.pref_sort_order_default));
+
+        String sortOrder = getString(R.string.pref_sort_order_default);
+        if (preferences != null) {
+            sortOrder = preferences.getString(
+                    getString(R.string.pref_title_sort_order),
+                    getString(R.string.pref_sort_order_default));
+        }
+
 
         FetchMovieTask task = new FetchMovieTask(adapter);
         task.execute(sortOrder, Constants.API_KEY);
@@ -99,7 +101,6 @@ public class MainActivity extends AppCompatActivity {
             startActivity(new Intent(this, SettingsActivity.class));
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 }
