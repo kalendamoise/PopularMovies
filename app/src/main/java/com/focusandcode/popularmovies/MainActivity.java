@@ -25,6 +25,12 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferences preferences;
 
     @Override
+    public void onStart() {
+        super.onStart();
+        fetchdata();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -71,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
         String sortOrder = getString(R.string.pref_sort_order_default);
         if (preferences != null) {
             sortOrder = preferences.getString(
-                    getString(R.string.pref_title_sort_order),
+                    getString(R.string.pref_title_sort_order_key),
                     getString(R.string.pref_sort_order_default));
         }
 

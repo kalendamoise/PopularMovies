@@ -12,7 +12,7 @@
 
     <string name="pref_title_sort_order_key" translatable="false">Sort</string>
     <string name="pref_sort_order_default" translatable="false">"popularity.desc"</string>
-    <string name="pref_title_sort_order" >Sort By</string>
+    <string name="pref_title_sort_order" >Sort Order</string>
     <string-array name="pref_list_titles">
         <item>Popularity Descendant</item>
         <item>Popularity Ascendant</item>
@@ -25,7 +25,6 @@
         <item>"vote_count.desc"</item>
         <item>"vote_count.asc"</item>
     </string-array>
-
 
     <string name="title_activity_detail">Movie Details</string>
 </resources>
