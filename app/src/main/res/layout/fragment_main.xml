@@ -3,7 +3,7 @@
     android:layout_height="match_parent" android:paddingLeft="0dp"
     android:paddingRight="0dp"
     android:paddingTop="0dp"
-    android:paddingBottom="1dp" tools:showIn="@layout/activity_main"
+    android:paddingBottom="0dp" tools:showIn="@layout/activity_main"
     tools:context=".MainActivityFragment">
 
     <GridView xmlns:android="http://schemas.android.com/apk/res/android"
