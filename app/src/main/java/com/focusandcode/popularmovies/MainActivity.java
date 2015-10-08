@@ -4,8 +4,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -27,7 +25,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onStart() {
         super.onStart();
-        fetchdata();
+        if (adapter == null) {
+            adapter = new GridViewAdapter(this,R.layout.gridview_layout, movies);
+        } else {
+            adapter.clear();
+        }
+        fetchdata(1);
     }
 
     @Override
@@ -40,20 +43,21 @@ public class MainActivity extends AppCompatActivity {
         adapter = new GridViewAdapter(this,R.layout.gridview_layout, movies);
         GridView gridview = (GridView) findViewById(R.id.gridview);
         gridview.setAdapter(adapter);
+        fetchdata(1);
 
-
-        fetchdata();
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        gridview.setOnScrollListener(new EndlessScrollListener() {
             @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-
-                fetchdata();
+            public boolean onLoadMore(int page, int totalItemsCount) {
+                // Triggered only when new data needs to be appended to the list
+                // Add whatever code is needed to append new items to your AdapterView
+                fetchdata(page);
+                // or customLoadMoreDataFromApi(totalItemsCount);
+                return true; // ONLY if more data is actually being loaded; false otherwise.
             }
         });
+
+
+
 
 
         gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -72,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
         preferences =  PreferenceManager.getDefaultSharedPreferences(this);
     }
 
-    private void fetchdata() {
+    private void fetchdata(int page) {
 
         String sortOrder = getString(R.string.pref_sort_order_default);
         if (preferences != null) {
@@ -83,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         FetchMovieTask task = new FetchMovieTask(adapter);
-        task.execute(sortOrder, Constants.API_KEY);
+        task.execute(sortOrder, Constants.API_KEY, String.valueOf(page));
         adapter.notifyDataSetChanged();
 
     }

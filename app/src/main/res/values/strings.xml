@@ -27,4 +27,5 @@
     </string-array>
 
     <string name="title_activity_detail">Movie Details</string>
+    <string name="action_share">Share</string>
 </resources>

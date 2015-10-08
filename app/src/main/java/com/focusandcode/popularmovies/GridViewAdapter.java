@@ -2,7 +2,6 @@ package com.focusandcode.popularmovies;
 
 import android.app.Activity;
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,30 +33,6 @@ public class GridViewAdapter  extends ArrayAdapter<Movie> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-//        ImageView imageView;
-//        if (convertView == null) {
-//            // if it's not recycled, initialize some attributes
-//            imageView = new ImageView(context);
-//            imageView.setLayoutParams(new GridView.LayoutParams(525, 800));
-//            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-//            imageView.setPadding(0, 0, 0, 0);
-//        } else {
-//            imageView = (ImageView) convertView;
-//        }
-//
-//
-//        if (getItem(position) != null) {
-//
-//            if (imageView != null) {
-//                String uri = Constants.IMAGE_BASE_URL + "/" + Constants.IMAGE_SIZE + "/" + ((Movie)getItem(position)).getPosterPath();
-//
-//                Picasso.with(context).load(uri)
-//                        .into(imageView);
-//                Log.d(LOG_TAG, "done updating the image view for: " + uri);
-//            }
-//        }
-//
-//        return imageView;
 
         View row = convertView;
         ViewHolder holder = null;
@@ -91,10 +66,6 @@ public class GridViewAdapter  extends ArrayAdapter<Movie> {
         return movies;
     }
 
-    public void setMovies(List<Movie> movies) {
-        this.movies = movies;
-        Log.d( LOG_TAG, "Init movies");
-    }
 
     static class ViewHolder {
         TextView imageTitle;

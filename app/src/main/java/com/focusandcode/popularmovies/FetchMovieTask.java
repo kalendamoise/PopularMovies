@@ -34,7 +34,7 @@ public class FetchMovieTask  extends AsyncTask<String, Void, List<Movie>> {
 
     private List<Movie> getMovieDataFromJson(String forecastJsonStr, int numDays)
             throws JSONException {
-        Log.d(LOG_TAG, "Json String: " + forecastJsonStr);
+        //Log.d(LOG_TAG, "Json String: " + forecastJsonStr);
         final String RESULTS = "results";
 
         JSONObject moviesJson = new JSONObject(forecastJsonStr);
@@ -45,7 +45,7 @@ public class FetchMovieTask  extends AsyncTask<String, Void, List<Movie>> {
         for(int i = 0; i < movieArray.length(); i++) {
             JSONObject movieJson = movieArray.getJSONObject(i);
             movies.add(gson.fromJson(movieJson.toString(), Movie.class));
-            Log.d(LOG_TAG, "Movie to String: " + movies.get(i).toString());
+            //Log.d(LOG_TAG, "Movie to String: " + movies.get(i).toString());
         }
         return movies;
 
@@ -77,6 +77,7 @@ public class FetchMovieTask  extends AsyncTask<String, Void, List<Movie>> {
 
             final String SORT_ORDER_PARAM = "sort_by";
             final String API_KEY_PARAM = "api_key";
+            final String PAGE = "page";
 
 
 
@@ -85,6 +86,7 @@ public class FetchMovieTask  extends AsyncTask<String, Void, List<Movie>> {
                     //.appendQueryParameter(QUERY_PARAM, params[0])
                     .appendQueryParameter(SORT_ORDER_PARAM, params[0])
                     .appendQueryParameter(API_KEY_PARAM, params[1])
+                    .appendQueryParameter(PAGE, params[2])
                     .build();
 
             URL url = new URL(builtUri.toString());
@@ -150,7 +152,6 @@ public class FetchMovieTask  extends AsyncTask<String, Void, List<Movie>> {
     @Override
     protected void onPostExecute(List<Movie> results) {
         if (results != null) {
-            adapter.getMovies().clear();
             adapter.getMovies().addAll(results);
             adapter.notifyDataSetChanged();
         }
