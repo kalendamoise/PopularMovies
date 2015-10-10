@@ -12,7 +12,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -34,9 +37,23 @@ public class DetailActivityFragment extends Fragment {
         Intent intent = getActivity().getIntent();
         if (intent != null) {
             movie = intent.getExtras().getParcelable("movie");
-            TextView tv = (TextView) rootView.findViewById(R.id.editText);
-            Log.d(LOG_TAG,  tv == null ? "TV IS NULL" : "TV IS NOT NULL");
-            tv.setText(movie.toString());
+
+            String uri = Constants.IMAGE_BASE_URL + "/" + Constants.IMAGE_SIZE + "/" + movie.getPosterPath();
+            ImageView imageView = (ImageView) rootView.findViewById(R.id.movie_poster);
+            Picasso.with(getActivity().getApplicationContext()).load(uri).into(imageView);
+
+
+            TextView originalTitle = (TextView) rootView.findViewById(R.id.original_title);
+            originalTitle.setText(movie.getOriginalTitle());
+            TextView releaseDate = (TextView) rootView.findViewById(R.id.release_date);
+            releaseDate.setText( movie.getReleaseDate().trim());
+            TextView plotSynopsis = (TextView) rootView.findViewById(R.id.plot_synopsis);
+            plotSynopsis.setText(movie.getOverview());
+
+
+            TextView rating = (TextView) rootView.findViewById(R.id.rating);
+            rating.setText(String.valueOf(movie.getVoteAverage()));
+
         }
 
         //Log.d(LOG_TAG, movie.toString());

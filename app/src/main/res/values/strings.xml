@@ -28,4 +28,7 @@
 
     <string name="title_activity_detail">Movie Details</string>
     <string name="action_share">Share</string>
+    <string name="release_date">Release: </string>
+    <string name="rating">Rating: </string>
+    <string name="plot_synopsis">Plot Synopsis</string>
 </resources>

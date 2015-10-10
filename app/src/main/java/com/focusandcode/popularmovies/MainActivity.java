@@ -25,12 +25,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onStart() {
         super.onStart();
-        if (adapter == null) {
-            adapter = new GridViewAdapter(this,R.layout.gridview_layout, movies);
-        } else {
-            adapter.clear();
-        }
-        fetchdata(1);
+        fetchData(1);
     }
 
     @Override
@@ -43,22 +38,18 @@ public class MainActivity extends AppCompatActivity {
         adapter = new GridViewAdapter(this,R.layout.gridview_layout, movies);
         GridView gridview = (GridView) findViewById(R.id.gridview);
         gridview.setAdapter(adapter);
-        fetchdata(1);
+        fetchData(1);
 
         gridview.setOnScrollListener(new EndlessScrollListener() {
             @Override
             public boolean onLoadMore(int page, int totalItemsCount) {
                 // Triggered only when new data needs to be appended to the list
                 // Add whatever code is needed to append new items to your AdapterView
-                fetchdata(page);
+                fetchData(page);
                 // or customLoadMoreDataFromApi(totalItemsCount);
                 return true; // ONLY if more data is actually being loaded; false otherwise.
             }
         });
-
-
-
-
 
         gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
@@ -76,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
         preferences =  PreferenceManager.getDefaultSharedPreferences(this);
     }
 
-    private void fetchdata(int page) {
+    private void fetchData(int page) {
 
         String sortOrder = getString(R.string.pref_sort_order_default);
         if (preferences != null) {
@@ -84,8 +75,9 @@ public class MainActivity extends AppCompatActivity {
                     getString(R.string.pref_title_sort_order_key),
                     getString(R.string.pref_sort_order_default));
         }
-
-
+        if (adapter == null) {
+            adapter = new GridViewAdapter(this,R.layout.gridview_layout, movies);
+        }
         FetchMovieTask task = new FetchMovieTask(adapter);
         task.execute(sortOrder, Constants.API_KEY, String.valueOf(page));
         adapter.notifyDataSetChanged();
