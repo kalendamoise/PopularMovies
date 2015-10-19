@@ -15,5 +15,27 @@
         android:stretchMode="columnWidth"
         android:numColumns="2"/>
     />
+
+    <LinearLayout
+        android:id="@+id/linlaProgressBar"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:gravity="center"
+        android:orientation="horizontal" >
+
+        <ProgressBar
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="2dp" />
+    </LinearLayout>
+    <TextView
+        android:id="@+id/tv_no_data"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:gravity="center"
+        android:layout_weight="1"
+        android:text="@string/no_data"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
 </RelativeLayout>
 

@@ -1,5 +1,6 @@
 package com.focusandcode.popularmovies;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -38,9 +39,36 @@ public class DetailActivityFragment extends Fragment {
         if (intent != null) {
             movie = intent.getExtras().getParcelable("movie");
 
-            String uri = Constants.IMAGE_BASE_URL + "/" + Constants.IMAGE_SIZE + "/" + movie.getPosterPath();
+            StringBuilder builder = new StringBuilder();
+            builder.append(Constants.IMAGE_BASE_URL)
+                    .append(Constants.SEPARATOR)
+                    .append(Constants.IMAGE_SIZE)
+                    .append(Constants.SEPARATOR)
+                    .append(movie.getBackdropPath());
+            String uri = builder.toString();
+
+            Log.d(LOG_TAG, "Backdrop URL: " + uri );
+
+            ImageView movieBackdr = (ImageView) rootView.findViewById(R.id.movie_backdr);
+
+            final Context context = getActivity().getApplicationContext();
+
+            Picasso.with(context).load(uri).into(movieBackdr);
+
+            builder = new StringBuilder();
+            builder.append(Constants.IMAGE_BASE_URL)
+                    .append(Constants.SEPARATOR)
+                    .append(Constants.IMAGE_SIZE)
+                    .append(Constants.SEPARATOR)
+                    .append(movie.getPosterPath());
+            uri = builder.toString();
+
+            Log.d(LOG_TAG, "Poster URL: " + uri );
+
+
+
             ImageView imageView = (ImageView) rootView.findViewById(R.id.movie_poster);
-            Picasso.with(getActivity().getApplicationContext()).load(uri).into(imageView);
+            Picasso.with(context).load(uri).into(imageView);
 
 
             TextView originalTitle = (TextView) rootView.findViewById(R.id.original_title);
@@ -88,7 +116,7 @@ public class DetailActivityFragment extends Fragment {
         shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
         shareIntent.setType("text/plain");
         shareIntent.putExtra(Intent.EXTRA_TEXT,
-                movie);
+                "Title: " + movie.getTitle() + " -- Synopsis: " + movie.getOverview());
         return shareIntent;
     }
 

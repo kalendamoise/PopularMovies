@@ -1,6 +1,5 @@
 package com.focusandcode.popularmovies;
 
-import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,7 +37,7 @@ public class GridViewAdapter  extends ArrayAdapter<Movie> {
         ViewHolder holder = null;
 
         if (row == null) {
-            LayoutInflater inflater = ((Activity) context).getLayoutInflater();
+            LayoutInflater inflater = LayoutInflater.from(context);
             row = inflater.inflate(layoutResourceId, parent, false);
             holder = new ViewHolder();
             holder.imageTitle = (TextView) row.findViewById(R.id.title);
@@ -50,8 +49,13 @@ public class GridViewAdapter  extends ArrayAdapter<Movie> {
 
         Movie movie = (Movie) getItem(position);
         if (movie != null) {
-
-            String uri = Constants.IMAGE_BASE_URL + "/" + Constants.IMAGE_SIZE + "/" + movie.getPosterPath();
+            StringBuilder builder = new StringBuilder();
+            builder.append(Constants.IMAGE_BASE_URL)
+                    .append(Constants.SEPARATOR)
+                    .append(Constants.IMAGE_SIZE)
+                    .append(Constants.SEPARATOR)
+                    .append(movie.getPosterPath());
+            String uri = builder.toString();
             if (holder.image != null) {
                 Picasso.with(context).load(uri).into(holder.image);
                 holder.imageTitle.setText(movie.getTitle());

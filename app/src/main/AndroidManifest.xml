@@ -3,6 +3,7 @@
     package="com.focusandcode.popularmovies" >
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
@@ -37,6 +38,17 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.focusandcode.popularmovies.MainActivity" />
         </activity>
+        <!--
+        <receiver
+            android:name="com.focusandcode.popularmovies.MainActivityFragment$NetworkChangeReceiver"
+            android:label="NetworkChangeReceiver"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+                <action android:name="android.net.wifi.WIFI_STATE_CHANGED" />
+            </intent-filter>
+        </receiver>
+        -->
     </application>
 
 </manifest>

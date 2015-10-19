@@ -4,6 +4,8 @@ package com.focusandcode.popularmovies;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.View;
+import android.widget.LinearLayout;
 
 import com.google.gson.Gson;
 
@@ -27,9 +29,12 @@ public class FetchMovieTask  extends AsyncTask<String, Void, List<Movie>> {
 
     private final String LOG_TAG = FetchMovieTask.class.getSimpleName();
     private GridViewAdapter adapter;
+    private LinearLayout spinnerView;
 
-    FetchMovieTask(GridViewAdapter adapter) {
+    FetchMovieTask(GridViewAdapter adapter, LinearLayout spinerView) {
         this.adapter = adapter;
+        this.spinnerView = spinerView;
+
     }
 
     private List<Movie> getMovieDataFromJson(String forecastJsonStr, int numDays)
@@ -69,24 +74,11 @@ public class FetchMovieTask  extends AsyncTask<String, Void, List<Movie>> {
         int limit = 7;
 
         try {
-            // Construct the URL for the OpenWeatherMap query
-            // Possible parameters are avaiable at OWM's forecast API page, at
-            // http://openweathermap.org/API#forecast
-            final String MOVIE_DB_BASE_URL =
-                    "http://api.themoviedb.org/3/discover/movie?";
 
-            final String SORT_ORDER_PARAM = "sort_by";
-            final String API_KEY_PARAM = "api_key";
-            final String PAGE = "page";
-
-
-
-
-            Uri builtUri = Uri.parse(MOVIE_DB_BASE_URL).buildUpon()
-                    //.appendQueryParameter(QUERY_PARAM, params[0])
-                    .appendQueryParameter(SORT_ORDER_PARAM, params[0])
-                    .appendQueryParameter(API_KEY_PARAM, params[1])
-                    .appendQueryParameter(PAGE, params[2])
+            Uri builtUri = Uri.parse(Constants.MOVIE_DB_BASE_URL).buildUpon()
+                    .appendQueryParameter(Constants.SORT_ORDER_PARAM, params[0])
+                    .appendQueryParameter(Constants.API_KEY_PARAM, params[1])
+                    .appendQueryParameter(Constants.PAGE, params[2])
                     .build();
 
             URL url = new URL(builtUri.toString());
@@ -151,9 +143,20 @@ public class FetchMovieTask  extends AsyncTask<String, Void, List<Movie>> {
 
     @Override
     protected void onPostExecute(List<Movie> results) {
+        if (spinnerView != null) {
+            spinnerView.setVisibility(View.GONE);
+        }
         if (results != null) {
-            adapter.getMovies().addAll(results);
-            adapter.notifyDataSetChanged();
+            for(Movie movie : results) {
+                adapter.add(movie);
+            }
+        }
+    }
+
+    @Override
+    protected void onPreExecute() {
+        if(spinnerView != null) {
+            spinnerView.setVisibility(View.VISIBLE);
         }
     }
 }

@@ -15,15 +15,11 @@
     <string name="pref_title_sort_order" >Sort Order</string>
     <string-array name="pref_list_titles">
         <item>Popularity Descendant</item>
-        <item>Popularity Ascendant</item>
         <item>Vote Count Descendant</item>
-        <item>Vote Count Ascendant</item>
     </string-array>
     <string-array name="pref_list_values">
         <item>"popularity.desc"</item>
-        <item>"popularity.asc"</item>
         <item>"vote_count.desc"</item>
-        <item>"vote_count.asc"</item>
     </string-array>
 
     <string name="title_activity_detail">Movie Details</string>
@@ -31,4 +27,6 @@
     <string name="release_date">Release: </string>
     <string name="rating">Rating: </string>
     <string name="plot_synopsis">Plot Synopsis</string>
+    <string name="no_data">No Internet Connection.</string>
+    <string name="lorem_ipsum">lorem ipsum (derived from Latin dolorem ipsum, translated as ) is a filler text commonly used to demonstrate the graphic elements of a document or visual presentation. Replacing meaningful content with placeholder text allows viewers to focus on graphic aspects such as font, typography, and page layout without being distracted by the content. It also reduces the need for the designer to come up with meaningful text, as they can instead use quickly-generated lorem ipsum. The lorem ipsum text is typically a scrambled section of De finibus bonorum et malorum, a 1st-century BC Latin text by Cicero, with words altered, added, and removed to make it nonsensical, improper Latin. A variation of the ordinary lorem ipsum text has been used in typesetting since the 1960s or earlier, when it was popularized by advertisements for Letraset transfer sheets. It was introduced to the Information Age in the mid-1980s by Aldus Corporation, which employed it in graphics and word processing templates for its desktop publishing program, PageMaker, for the Apple Macintosh.[1]</string>
 </resources>
