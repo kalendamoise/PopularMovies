@@ -57,7 +57,11 @@ public class GridViewAdapter  extends ArrayAdapter<Movie> {
                     .append(movie.getPosterPath());
             String uri = builder.toString();
             if (holder.image != null) {
-                Picasso.with(context).load(uri).into(holder.image);
+                Picasso.with(context)
+                        .load(uri)
+                        .placeholder(R.mipmap.ic_launcher)
+                        .error(R.mipmap.ic_launcher)
+                        .into(holder.image);
                 holder.imageTitle.setText(movie.getTitle());
             }
         }

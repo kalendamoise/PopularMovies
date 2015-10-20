@@ -53,7 +53,12 @@ public class DetailActivityFragment extends Fragment {
 
             final Context context = getActivity().getApplicationContext();
 
-            Picasso.with(context).load(uri).into(movieBackdr);
+            Picasso.with(context)
+                    .load(uri)
+                    .placeholder(R.mipmap.ic_launcher)
+                    .error(R.mipmap.ic_launcher)
+                    .into(movieBackdr);
+
 
             builder = new StringBuilder();
             builder.append(Constants.IMAGE_BASE_URL)
@@ -63,13 +68,16 @@ public class DetailActivityFragment extends Fragment {
                     .append(movie.getPosterPath());
             uri = builder.toString();
 
-            Log.d(LOG_TAG, "Poster URL: " + uri );
+            Log.d(LOG_TAG, "Poster URL: " + uri);
 
 
 
             ImageView imageView = (ImageView) rootView.findViewById(R.id.movie_poster);
-            Picasso.with(context).load(uri).into(imageView);
-
+            Picasso.with(context)
+                    .load(uri)
+                    .placeholder(R.mipmap.ic_launcher)
+                    .error(R.mipmap.ic_launcher)
+                    .into(imageView);
 
             TextView originalTitle = (TextView) rootView.findViewById(R.id.original_title);
             originalTitle.setText(movie.getOriginalTitle());

@@ -42,10 +42,21 @@ public class MainActivityFragment extends Fragment {
     }
 
     @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList(Constants.MOVIE_KEY, (ArrayList<? extends Parcelable>) movies);
+    }
+
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Add this line in order for this fragment to handle menu events.
         setHasOptionsMenu(true);
+        if (savedInstanceState != null)
+        {
+            movies = (List<Movie>)savedInstanceState.get(Constants.MOVIE_KEY);
+        }
     }
 
     @Override
