@@ -23,6 +23,9 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+
 /**
  * A placeholder fragment containing a simple view.
  */
@@ -31,11 +34,12 @@ public class MainActivityFragment extends Fragment {
     private GridViewAdapter adapter;
     private List<Movie> movies = new ArrayList<Movie>();
     private Parcelable state;
-    private GridView gridview;
+    @Bind(R.id.gridview) GridView gridview;
+    @Bind(R.id.tv_no_data) TextView tv;
+    @Bind(R.id.linlaProgressBar) LinearLayout spinnerView;
     private Context context;
     private View rootView;
     private NetworkChangeReceiver broadcastReceiver = new NetworkChangeReceiver();
-    private LinearLayout spinnerView;
 
 
     public MainActivityFragment() {
@@ -79,10 +83,11 @@ public class MainActivityFragment extends Fragment {
         Log.d(LOG_TAG, "Updating the UI");
 
         rootView = inflater.inflate(R.layout.fragment_main, container, false);
-        spinnerView =(LinearLayout) rootView.findViewById(R.id.linlaProgressBar);
+        ButterKnife.bind(this, rootView);
+
+
         adapter = new GridViewAdapter(context, R.layout.gridview_layout, movies);
 
-        gridview = (GridView) rootView.findViewById(R.id.gridview);
         gridview.setAdapter(adapter);
 
 
@@ -114,7 +119,6 @@ public class MainActivityFragment extends Fragment {
             gridview.onRestoreInstanceState(state);
         }
 
-        TextView tv = (TextView) rootView.findViewById(R.id.tv_no_data);
         if (Constants.NET_STATUS_NOT_CONNECTED.equals(NetworkUtil.getConnectivityStatusString(context)) && (movies.size() == 0)) {
             tv.setText(getString(R.string.no_data));
         } else {
@@ -152,6 +156,12 @@ public class MainActivityFragment extends Fragment {
             Log.d(LOG_TAG, "trying to restore listview state..");
             gridview.onRestoreInstanceState(state);
         }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ButterKnife.unbind(this);
     }
 
     private void fetchData() {

@@ -12,6 +12,9 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+
 /**
  * Created by Moise2022 on 9/25/15.
  */
@@ -31,23 +34,20 @@ public class GridViewAdapter  extends ArrayAdapter<Movie> {
 
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View row, ViewGroup parent) {
 
-        View row = convertView;
         ViewHolder holder = null;
 
         if (row == null) {
             LayoutInflater inflater = LayoutInflater.from(context);
             row = inflater.inflate(layoutResourceId, parent, false);
-            holder = new ViewHolder();
-            holder.imageTitle = (TextView) row.findViewById(R.id.title);
-            holder.image = (ImageView) row.findViewById(R.id.imageView);
+            holder = new ViewHolder(row);
             row.setTag(holder);
         } else {
             holder = (ViewHolder) row.getTag();
         }
 
-        Movie movie = (Movie) getItem(position);
+        Movie movie = getItem(position);
         if (movie != null) {
             StringBuilder builder = new StringBuilder();
             builder.append(Constants.IMAGE_BASE_URL)
@@ -76,7 +76,11 @@ public class GridViewAdapter  extends ArrayAdapter<Movie> {
 
 
     static class ViewHolder {
-        TextView imageTitle;
-        ImageView image;
+        @Bind(R.id.title) TextView imageTitle;
+        @Bind(R.id.imageView) ImageView image;
+
+        public ViewHolder(View view) {
+            ButterKnife.bind(this, view);
+        }
     }
 }

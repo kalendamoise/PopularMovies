@@ -18,12 +18,21 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+
 /**
  * A placeholder fragment containing a simple view.
  */
 public class DetailActivityFragment extends Fragment {
     private static final String LOG_TAG = DetailActivityFragment.class.getName();
     private Movie movie;
+
+    @Bind(R.id.movie_backdr) ImageView movieBackdr;
+    @Bind(R.id.movie_poster)ImageView imageView;
+    @Bind(R.id.original_title) TextView originalTitle;
+    @Bind(R.id.release_date) TextView releaseDate;
+    @Bind(R.id.plot_synopsis) TextView plotSynopsis;
 
     public DetailActivityFragment() {
         setHasOptionsMenu(true);
@@ -33,7 +42,7 @@ public class DetailActivityFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
-
+        ButterKnife.bind(this, rootView);
 
         Intent intent = getActivity().getIntent();
         if (intent != null) {
@@ -48,8 +57,6 @@ public class DetailActivityFragment extends Fragment {
             String uri = builder.toString();
 
             Log.d(LOG_TAG, "Backdrop URL: " + uri );
-
-            ImageView movieBackdr = (ImageView) rootView.findViewById(R.id.movie_backdr);
 
             final Context context = getActivity().getApplicationContext();
 
@@ -72,18 +79,17 @@ public class DetailActivityFragment extends Fragment {
 
 
 
-            ImageView imageView = (ImageView) rootView.findViewById(R.id.movie_poster);
+
             Picasso.with(context)
                     .load(uri)
                     .placeholder(R.mipmap.ic_launcher)
                     .error(R.mipmap.ic_launcher)
                     .into(imageView);
 
-            TextView originalTitle = (TextView) rootView.findViewById(R.id.original_title);
+
             originalTitle.setText(movie.getOriginalTitle());
-            TextView releaseDate = (TextView) rootView.findViewById(R.id.release_date);
+
             releaseDate.setText( movie.getReleaseDate().trim());
-            TextView plotSynopsis = (TextView) rootView.findViewById(R.id.plot_synopsis);
             plotSynopsis.setText(movie.getOverview());
 
 
@@ -117,6 +123,12 @@ public class DetailActivityFragment extends Fragment {
         } else {
             Log.d(LOG_TAG, "Share Action Provider is null?");
         }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ButterKnife.unbind(this);
     }
 
     private Intent createShareForecastIntent() {
