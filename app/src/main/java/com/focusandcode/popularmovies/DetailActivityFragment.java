@@ -1,9 +1,14 @@
 package com.focusandcode.popularmovies;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.ShareActionProvider;
 import android.util.Log;
@@ -13,19 +18,23 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.focusandcode.popularmovies.Data.MoviesContract;
 import com.squareup.picasso.Picasso;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * A placeholder fragment containing a simple view.
  */
-public class DetailActivityFragment extends Fragment {
+public class DetailActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
     private static final String LOG_TAG = DetailActivityFragment.class.getName();
+    private static final int CURSOR_LOADER_ID = 0;
     private Movie movie;
 
     @Bind(R.id.movie_backdr) ImageView movieBackdr;
@@ -33,6 +42,7 @@ public class DetailActivityFragment extends Fragment {
     @Bind(R.id.original_title) TextView originalTitle;
     @Bind(R.id.release_date) TextView releaseDate;
     @Bind(R.id.plot_synopsis) TextView plotSynopsis;
+    @Bind(R.id.add_to_favorite) Button addToFavorite;
 
     public DetailActivityFragment() {
         setHasOptionsMenu(true);
@@ -139,6 +149,72 @@ public class DetailActivityFragment extends Fragment {
                 "Title: " + movie.getTitle() + " -- Synopsis: " + movie.getOverview());
         return shareIntent;
     }
+    @OnClick(R.id.add_to_favorite)
+    public void addToFavorite(View view) {
 
+    }
 
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return new CursorLoader(getActivity(),
+                MoviesContract.MovieEntry.CONTENT_URI,
+                null,
+                null,
+                null,
+                null);
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState){
+        Cursor c =
+                getActivity().getContentResolver().query(MoviesContract.MovieEntry.CONTENT_URI,
+                        new String[]{MoviesContract.MovieEntry._ID},
+                        null,
+                        null,
+                        null);
+        if (c.getCount() == 0){
+            insertData();
+        }
+        // initialize loader
+        getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
+        super.onActivityCreated(savedInstanceState);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        Log.d(LOG_TAG, "The cursor data is: " + data.toString());
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        Log.d(LOG_TAG, "Cursor data has been reset");
+    }
+
+    // insert data into database
+    public void insertData(){
+        ContentValues[] movieValuesArr = new ContentValues[1];
+        // Loop through static array of Flavors, add each to an instance of ContentValues
+        // in the array of ContentValues
+        for(int i = 0; i < 1; i++){
+            movieValuesArr[i] = new ContentValues();
+            movieValuesArr[i].put( MoviesContract.MovieEntry.COLUMN_ORIGINAL_TITLE, movie.getOriginalTitle());
+            movieValuesArr[i].put(MoviesContract.MovieEntry._ID, movie.getId());
+            movieValuesArr[i].put(MoviesContract.MovieEntry.COLUMN_ADULT, movie.isAdult());
+            movieValuesArr[i].put(MoviesContract.MovieEntry.COLUMN_BACKDROP_PATH, movie.getBackdropPath());
+            movieValuesArr[i].put(MoviesContract.MovieEntry.COLUMN_ORIGINAL_LANGUAGE, movie.getOriginalLanguage());
+            movieValuesArr[i].put(MoviesContract.MovieEntry.COLUMN_OVERVIEW, movie.getOverview());
+            movieValuesArr[i].put(MoviesContract.MovieEntry.COLUMN_POPULARITY, movie.getPopularity());
+            movieValuesArr[i].put(MoviesContract.MovieEntry.COLUMN_RELEASE_DATE, movie.getReleaseDate());
+            movieValuesArr[i].put(MoviesContract.MovieEntry.COLUMN_POSTER_PATH, movie.getPosterPath());
+            movieValuesArr[i].put(MoviesContract.MovieEntry.COLUMN_TITLE, movie.getTitle());
+            movieValuesArr[i].put(MoviesContract.MovieEntry.COLUMN_VIDEO, movie.isVideo());
+            movieValuesArr[i].put(MoviesContract.MovieEntry.COLUMN_VOTE_AVERAGE, movie.getVoteAverage());
+            movieValuesArr[i].put(MoviesContract.MovieEntry.COLUMN_VOTE_COUNT, movie.getVoteCount());
+
+        }
+
+        // bulkInsert our ContentValues array
+        getActivity().getContentResolver().bulkInsert(MoviesContract.MovieEntry.CONTENT_URI,
+                movieValuesArr);
+    }
 }
