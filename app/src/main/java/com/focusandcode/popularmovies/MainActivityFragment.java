@@ -1,11 +1,14 @@
 package com.focusandcode.popularmovies;
 
+import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.net.ConnectivityManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
@@ -19,6 +22,8 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.focusandcode.popularmovies.Data.MoviesContract;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -164,6 +169,7 @@ public class MainActivityFragment extends Fragment {
         ButterKnife.unbind(this);
     }
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     private void fetchData() {
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -176,13 +182,42 @@ public class MainActivityFragment extends Fragment {
             adapter = new GridViewAdapter(getActivity(), R.layout.gridview_layout, movies);
         }
         adapter.getMovies().clear();
-        FetchMovieTask task = new FetchMovieTask(adapter, spinnerView);
-        task.execute(sortOrder, Constants.API_KEY, String.valueOf(1));
+
+        if (sortOrder.equals("favorite")) {
+            getActivity().setTitle("Favorite Movies");
+
+            Cursor cursor = getActivity().getContentResolver().query(MoviesContract.MovieEntry.CONTENT_URI, null, null, null, null, null);
+            Log.d(LOG_TAG, "The number of favorite movies is: " + cursor.getCount());
+            while (cursor.moveToNext()) {
+                Movie movie = new Movie();
+                movie.setTitle(cursor.getString(cursor.getColumnIndex(MoviesContract.MovieEntry.COLUMN_TITLE)));
+                movie.setBackdropPath(cursor.getString(cursor.getColumnIndex(MoviesContract.MovieEntry.COLUMN_BACKDROP_PATH)));
+                movie.setId(cursor.getInt(cursor.getColumnIndex(MoviesContract.MovieEntry._ID)));
+                movie.setIsAdult((cursor.getInt(cursor.getColumnIndex(MoviesContract.MovieEntry.COLUMN_ADULT)) == 0 ? false : true));
+                movie.setIsVideo((cursor.getInt(cursor.getColumnIndex(MoviesContract.MovieEntry.COLUMN_VIDEO)) == 0 ? false : true));
+                movie.setOriginalLanguage(cursor.getString(cursor.getColumnIndex(MoviesContract.MovieEntry.COLUMN_ORIGINAL_LANGUAGE)));
+                movie.setOriginalTitle(cursor.getString(cursor.getColumnIndex(MoviesContract.MovieEntry.COLUMN_ORIGINAL_TITLE)));
+                movie.setOverview(cursor.getString(cursor.getColumnIndex(MoviesContract.MovieEntry.COLUMN_OVERVIEW)));
+                movie.setPopularity(cursor.getDouble(cursor.getColumnIndex(MoviesContract.MovieEntry.COLUMN_POPULARITY)));
+                movie.setPosterPath(cursor.getString(cursor.getColumnIndex(MoviesContract.MovieEntry.COLUMN_POSTER_PATH)));
+                movie.setReleaseDate(cursor.getString(cursor.getColumnIndex(MoviesContract.MovieEntry.COLUMN_RELEASE_DATE)));
+                movie.setVoteAverage(cursor.getDouble(cursor.getColumnIndex(MoviesContract.MovieEntry.COLUMN_VOTE_AVERAGE)));
+                movie.setVoteCount(cursor.getInt(cursor.getColumnIndex(MoviesContract.MovieEntry.COLUMN_VOTE_COUNT)));
+                movies.add(movie);
+                Log.d(LOG_TAG, movie.toString());
+            }
+
+        }
+        else {
+            FetchMovieTask task = new FetchMovieTask(adapter, spinnerView);
+            task.execute(sortOrder, Constants.API_KEY, String.valueOf(1));
+        }
         adapter.notifyDataSetChanged();
 
     }
 
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     private void fetchDataAppend(int page) {
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -191,11 +226,15 @@ public class MainActivityFragment extends Fragment {
                 this.getString(R.string.pref_sort_order_default));
 
         Log.d(LOG_TAG, "SortOrder: " + sortOrder);
+
         if (adapter == null) {
             adapter = new GridViewAdapter(getActivity(), R.layout.gridview_layout, movies);
         }
-        FetchMovieTask task = new FetchMovieTask(adapter, spinnerView);
-        task.execute(sortOrder, Constants.API_KEY, String.valueOf(page));
+
+        if (!sortOrder.equals("favorite")) {
+            FetchMovieTask task = new FetchMovieTask(adapter, spinnerView);
+            task.execute(sortOrder, Constants.API_KEY, String.valueOf(page));
+        }
         adapter.notifyDataSetChanged();
 
     }

@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -36,6 +37,8 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     private static final String LOG_TAG = DetailActivityFragment.class.getName();
     private static final int CURSOR_LOADER_ID = 0;
     private Movie movie;
+    private int mPosition;
+    private Uri mUri = MoviesContract.MovieEntry.CONTENT_URI;
 
     @Bind(R.id.movie_backdr) ImageView movieBackdr;
     @Bind(R.id.movie_poster)ImageView imageView;
@@ -46,6 +49,18 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
 
     public DetailActivityFragment() {
         setHasOptionsMenu(true);
+    }
+
+
+    public static DetailActivityFragment newInstance(int position, Uri uri) {
+        DetailActivityFragment fragment = new DetailActivityFragment();
+        Bundle args = new Bundle();
+        fragment.mPosition = position;
+        Log.d(LOG_TAG, "Invoke newInstance ...");
+        fragment.mUri = uri;
+        args.putInt("id", position);
+        fragment.setArguments(args);
+        return fragment;
     }
 
     @Override
@@ -151,16 +166,52 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     }
     @OnClick(R.id.add_to_favorite)
     public void addToFavorite(View view) {
+        Log.d(LOG_TAG, "Add to favorite called");
+
+        String selection = MoviesContract.MovieEntry._ID;
+        String [] selectionArgs = new String[]{String.valueOf(movie.getId())};
+
+
+        Cursor cursor = getActivity().getContentResolver().query(MoviesContract.MovieEntry.buildFlavorsUri(movie.getId()), null, selection, selectionArgs, null);
+
+        if (cursor.getCount() == 0) {
+
+            ContentValues contentValue = new ContentValues();
+            contentValue.put(MoviesContract.MovieEntry.COLUMN_ORIGINAL_TITLE, movie.getOriginalTitle());
+            contentValue.put(MoviesContract.MovieEntry._ID, movie.getId());
+            contentValue.put(MoviesContract.MovieEntry.COLUMN_ADULT, movie.isAdult());
+            contentValue.put(MoviesContract.MovieEntry.COLUMN_BACKDROP_PATH, movie.getBackdropPath());
+            contentValue.put(MoviesContract.MovieEntry.COLUMN_ORIGINAL_LANGUAGE, movie.getOriginalLanguage());
+            contentValue.put(MoviesContract.MovieEntry.COLUMN_OVERVIEW, movie.getOverview());
+            contentValue.put(MoviesContract.MovieEntry.COLUMN_POPULARITY, movie.getPopularity());
+            contentValue.put(MoviesContract.MovieEntry.COLUMN_RELEASE_DATE, movie.getReleaseDate());
+            contentValue.put(MoviesContract.MovieEntry.COLUMN_POSTER_PATH, movie.getPosterPath());
+            contentValue.put(MoviesContract.MovieEntry.COLUMN_TITLE, movie.getTitle());
+            contentValue.put(MoviesContract.MovieEntry.COLUMN_VIDEO, movie.isVideo());
+            contentValue.put(MoviesContract.MovieEntry.COLUMN_VOTE_AVERAGE, movie.getVoteAverage());
+            contentValue.put(MoviesContract.MovieEntry.COLUMN_VOTE_COUNT, movie.getVoteCount());
+
+            getActivity().getContentResolver().insert(MoviesContract.MovieEntry.CONTENT_URI,
+                    contentValue);
+        } else {
+            Log.d(LOG_TAG, "This movie is already in the database. The count was: " + cursor.getCount());
+        }
 
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        String selection = null;
+        String [] selectionArgs = null;
+        if (args != null){
+            selection = MoviesContract.MovieEntry._ID;
+            selectionArgs = new String[]{String.valueOf(movie.getId())};
+        }
         return new CursorLoader(getActivity(),
-                MoviesContract.MovieEntry.CONTENT_URI,
+                mUri,
                 null,
-                null,
-                null,
+                selection,
+                selectionArgs,
                 null);
     }
 
@@ -173,7 +224,7 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
                         null,
                         null);
         if (c.getCount() == 0){
-            insertData();
+            //insertData();
         }
         // initialize loader
         getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
@@ -183,6 +234,7 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         Log.d(LOG_TAG, "The cursor data is: " + data.toString());
+        Log.d(LOG_TAG, "The count was: " + data.getCount());
     }
 
     @Override

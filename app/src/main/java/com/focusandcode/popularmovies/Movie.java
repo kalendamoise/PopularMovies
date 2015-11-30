@@ -225,6 +225,8 @@ public class Movie implements Parcelable{
         this.voteCount = in.readInt();
     }
 
+    public Movie(){};
+
     /**
      * Creator required for class implementing the parcelable interface.
      */
