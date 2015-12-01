@@ -185,8 +185,8 @@ public class MainActivityFragment extends Fragment {
 
         if (sortOrder.equals("favorite")) {
             getActivity().setTitle("Favorite Movies");
-
-            Cursor cursor = getActivity().getContentResolver().query(MoviesContract.MovieEntry.CONTENT_URI, null, null, null, null, null);
+            String orderBy = MoviesContract.MovieEntry.COLUMN_POPULARITY + " DESC";
+            Cursor cursor = getActivity().getContentResolver().query(MoviesContract.MovieEntry.CONTENT_URI, null, null, null, orderBy, null);
             Log.d(LOG_TAG, "The number of favorite movies is: " + cursor.getCount());
             while (cursor.moveToNext()) {
                 Movie movie = new Movie();
@@ -206,6 +206,8 @@ public class MainActivityFragment extends Fragment {
                 movies.add(movie);
                 Log.d(LOG_TAG, movie.toString());
             }
+
+            spinnerView.setVisibility(View.INVISIBLE);
 
         }
         else {
@@ -231,7 +233,9 @@ public class MainActivityFragment extends Fragment {
             adapter = new GridViewAdapter(getActivity(), R.layout.gridview_layout, movies);
         }
 
-        if (!sortOrder.equals("favorite")) {
+        if (sortOrder.equals("favorite")) {
+            spinnerView.setVisibility(View.INVISIBLE);
+        }else {
             FetchMovieTask task = new FetchMovieTask(adapter, spinnerView);
             task.execute(sortOrder, Constants.API_KEY, String.valueOf(page));
         }

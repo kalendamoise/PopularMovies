@@ -19,7 +19,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -45,7 +45,8 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     @Bind(R.id.original_title) TextView originalTitle;
     @Bind(R.id.release_date) TextView releaseDate;
     @Bind(R.id.plot_synopsis) TextView plotSynopsis;
-    @Bind(R.id.add_to_favorite) Button addToFavorite;
+    @Bind(R.id.add_to_favorite)
+    ImageButton addToFavorite;
 
     public DetailActivityFragment() {
         setHasOptionsMenu(true);
@@ -123,7 +124,18 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
 
         }
 
-        //Log.d(LOG_TAG, movie.toString());
+        Log.d(LOG_TAG, movie.toString());
+
+        // check to see if the movie is present in the database and toggle the favorite image button accordingly.
+        String selection = MoviesContract.MovieEntry._ID;
+        String [] selectionArgs = new String[]{String.valueOf(movie.getId())};
+        Cursor cursor = getActivity().getContentResolver().query(MoviesContract.MovieEntry.buildFlavorsUri(movie.getId()), null, selection, selectionArgs, null);
+
+        if (cursor.getCount() == 0) {
+            addToFavorite.setImageResource(android.R.drawable.btn_star_big_off);
+        } else {
+            addToFavorite.setImageResource(android.R.drawable.btn_star_big_on);
+        }
 
 
         return rootView;
@@ -166,7 +178,7 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     }
     @OnClick(R.id.add_to_favorite)
     public void addToFavorite(View view) {
-        Log.d(LOG_TAG, "Add to favorite called");
+
 
         String selection = MoviesContract.MovieEntry._ID;
         String [] selectionArgs = new String[]{String.valueOf(movie.getId())};
@@ -175,6 +187,10 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
         Cursor cursor = getActivity().getContentResolver().query(MoviesContract.MovieEntry.buildFlavorsUri(movie.getId()), null, selection, selectionArgs, null);
 
         if (cursor.getCount() == 0) {
+
+            // change the button to indicate the image was added to the favorite
+            addToFavorite.setImageResource(android.R.drawable.btn_star_big_on);
+            Log.d(LOG_TAG, "Add to favorite called");
 
             ContentValues contentValue = new ContentValues();
             contentValue.put(MoviesContract.MovieEntry.COLUMN_ORIGINAL_TITLE, movie.getOriginalTitle());
@@ -195,6 +211,11 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
                     contentValue);
         } else {
             Log.d(LOG_TAG, "This movie is already in the database. The count was: " + cursor.getCount());
+            addToFavorite.setImageResource(android.R.drawable.btn_star_big_off);
+            int rowDeleted = getActivity().getContentResolver().delete(MoviesContract.MovieEntry.CONTENT_URI, MoviesContract.MovieEntry._ID  +" = "+ movie.getId(), null);
+            if (rowDeleted > 0) {
+                Log.d(LOG_TAG, "The movie " + movie.getTitle() + " was successfully remove from favorite.");
+            }
         }
 
     }

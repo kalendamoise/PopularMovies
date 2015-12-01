@@ -131,16 +131,16 @@ public class MoviesProvider extends ContentProvider {
                 numDeleted = db.delete(
                         MoviesContract.MovieEntry.TABLE_MOVIE, selection, selectionArgs);
                 // reset _ID
-                db.execSQL("DELETE FROM SQLITE_SEQUENCE WHERE NAME = '" +
-                        MoviesContract.MovieEntry.TABLE_MOVIE + "'");
+//                db.execSQL("DELETE FROM SQLITE_SEQUENCE WHERE NAME = '" +
+//                        MoviesContract.MovieEntry.TABLE_MOVIE + "'");
                 break;
             case MOVIE_WITH_ID:
                 numDeleted = db.delete(MoviesContract.MovieEntry.TABLE_MOVIE,
                         MoviesContract.MovieEntry._ID + " = ?",
                         new String[]{String.valueOf(ContentUris.parseId(uri))});
                 // reset _ID
-                db.execSQL("DELETE FROM SQLITE_SEQUENCE WHERE NAME = '" +
-                        MoviesContract.MovieEntry.TABLE_MOVIE + "'");
+//                db.execSQL("DELETE FROM SQLITE_SEQUENCE WHERE NAME = '" +
+//                        MoviesContract.MovieEntry.TABLE_MOVIE + "'");
 
                 break;
             default:
