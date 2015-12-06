@@ -1,0 +1,24 @@
+package com.focusandcode.popularmovies.Services;
+
+import com.focusandcode.popularmovies.Constants;
+import com.focusandcode.popularmovies.Entities.ListMovieReviews;
+import com.focusandcode.popularmovies.Entities.ListMovieVideos;
+
+import retrofit.Callback;
+import retrofit.http.GET;
+import retrofit.http.Path;
+import retrofit.http.Query;
+
+/**
+ * Created by Moise2022 on 12/3/15.
+ */
+public interface MovieService {
+    @GET("/discover/movie")
+    void getMovies(@Query(Constants.API_KEY_PARAM) String api_key, @Query(Constants.SORT_ORDER_PARAM) String sortBy);
+
+    @GET("/movie/{id}/videos")
+    void getMovieVideos(@Path("id") Long id, @Query(Constants.API_KEY_PARAM) String api_key, Callback<ListMovieVideos> callback);
+
+    @GET("/movie/{id}/reviews")
+    void getMovieReviews(@Path("id") Long id, @Query(Constants.API_KEY_PARAM) String api_key, Callback<ListMovieReviews> callback);
+}

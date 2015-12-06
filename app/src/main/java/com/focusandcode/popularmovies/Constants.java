@@ -10,6 +10,7 @@ public class Constants {
     public static final String NET_STATUS_NOT_CONNECTED = "Not connected to Internet";
     public static final String SEPARATOR = "/";
 
+    public static final String BASE_URL = "http://api.themoviedb.org/3/";
     public static final String MOVIE_DB_BASE_URL = "http://api.themoviedb.org/3/discover/movie?";
 
     public static final String SORT_ORDER_PARAM = "sort_by";

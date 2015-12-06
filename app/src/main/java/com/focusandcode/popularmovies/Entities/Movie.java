@@ -1,4 +1,4 @@
-package com.focusandcode.popularmovies;
+package com.focusandcode.popularmovies.Entities;
 
 import android.os.Parcel;
 import android.os.Parcelable;

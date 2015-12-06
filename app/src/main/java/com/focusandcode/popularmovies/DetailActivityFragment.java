@@ -24,6 +24,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.focusandcode.popularmovies.Data.MoviesContract;
+import com.focusandcode.popularmovies.Entities.Movie;
+import com.focusandcode.popularmovies.adapters.RestClient;
 import com.squareup.picasso.Picasso;
 
 import butterknife.Bind;
@@ -102,6 +104,7 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
             uri = builder.toString();
 
             Log.d(LOG_TAG, "Poster URL: " + uri);
+            Log.d(LOG_TAG, "Movie ID: " + movie.getId());
 
 
 
@@ -263,31 +266,38 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
         Log.d(LOG_TAG, "Cursor data has been reset");
     }
 
-    // insert data into database
-    public void insertData(){
-        ContentValues[] movieValuesArr = new ContentValues[1];
-        // Loop through static array of Flavors, add each to an instance of ContentValues
-        // in the array of ContentValues
-        for(int i = 0; i < 1; i++){
-            movieValuesArr[i] = new ContentValues();
-            movieValuesArr[i].put( MoviesContract.MovieEntry.COLUMN_ORIGINAL_TITLE, movie.getOriginalTitle());
-            movieValuesArr[i].put(MoviesContract.MovieEntry._ID, movie.getId());
-            movieValuesArr[i].put(MoviesContract.MovieEntry.COLUMN_ADULT, movie.isAdult());
-            movieValuesArr[i].put(MoviesContract.MovieEntry.COLUMN_BACKDROP_PATH, movie.getBackdropPath());
-            movieValuesArr[i].put(MoviesContract.MovieEntry.COLUMN_ORIGINAL_LANGUAGE, movie.getOriginalLanguage());
-            movieValuesArr[i].put(MoviesContract.MovieEntry.COLUMN_OVERVIEW, movie.getOverview());
-            movieValuesArr[i].put(MoviesContract.MovieEntry.COLUMN_POPULARITY, movie.getPopularity());
-            movieValuesArr[i].put(MoviesContract.MovieEntry.COLUMN_RELEASE_DATE, movie.getReleaseDate());
-            movieValuesArr[i].put(MoviesContract.MovieEntry.COLUMN_POSTER_PATH, movie.getPosterPath());
-            movieValuesArr[i].put(MoviesContract.MovieEntry.COLUMN_TITLE, movie.getTitle());
-            movieValuesArr[i].put(MoviesContract.MovieEntry.COLUMN_VIDEO, movie.isVideo());
-            movieValuesArr[i].put(MoviesContract.MovieEntry.COLUMN_VOTE_AVERAGE, movie.getVoteAverage());
-            movieValuesArr[i].put(MoviesContract.MovieEntry.COLUMN_VOTE_COUNT, movie.getVoteCount());
-
-        }
-
-        // bulkInsert our ContentValues array
-        getActivity().getContentResolver().bulkInsert(MoviesContract.MovieEntry.CONTENT_URI,
-                movieValuesArr);
+    @Override
+    public void onResume() {
+        super.onResume();
+        new RestClient().runRetrofitTestSync(87101L);
     }
+
+
+    //    // insert data into database
+//    public void insertData(){
+//        ContentValues[] movieValuesArr = new ContentValues[1];
+//        // Loop through static array of Flavors, add each to an instance of ContentValues
+//        // in the array of ContentValues
+//        for(int i = 0; i < 1; i++){
+//            movieValuesArr[i] = new ContentValues();
+//            movieValuesArr[i].put( MoviesContract.MovieEntry.COLUMN_ORIGINAL_TITLE, movie.getOriginalTitle());
+//            movieValuesArr[i].put(MoviesContract.MovieEntry._ID, movie.getId());
+//            movieValuesArr[i].put(MoviesContract.MovieEntry.COLUMN_ADULT, movie.isAdult());
+//            movieValuesArr[i].put(MoviesContract.MovieEntry.COLUMN_BACKDROP_PATH, movie.getBackdropPath());
+//            movieValuesArr[i].put(MoviesContract.MovieEntry.COLUMN_ORIGINAL_LANGUAGE, movie.getOriginalLanguage());
+//            movieValuesArr[i].put(MoviesContract.MovieEntry.COLUMN_OVERVIEW, movie.getOverview());
+//            movieValuesArr[i].put(MoviesContract.MovieEntry.COLUMN_POPULARITY, movie.getPopularity());
+//            movieValuesArr[i].put(MoviesContract.MovieEntry.COLUMN_RELEASE_DATE, movie.getReleaseDate());
+//            movieValuesArr[i].put(MoviesContract.MovieEntry.COLUMN_POSTER_PATH, movie.getPosterPath());
+//            movieValuesArr[i].put(MoviesContract.MovieEntry.COLUMN_TITLE, movie.getTitle());
+//            movieValuesArr[i].put(MoviesContract.MovieEntry.COLUMN_VIDEO, movie.isVideo());
+//            movieValuesArr[i].put(MoviesContract.MovieEntry.COLUMN_VOTE_AVERAGE, movie.getVoteAverage());
+//            movieValuesArr[i].put(MoviesContract.MovieEntry.COLUMN_VOTE_COUNT, movie.getVoteCount());
+//
+//        }
+//
+//        // bulkInsert our ContentValues array
+//        getActivity().getContentResolver().bulkInsert(MoviesContract.MovieEntry.CONTENT_URI,
+//                movieValuesArr);
+//    }
 }

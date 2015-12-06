@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 
+import com.focusandcode.popularmovies.Entities.Movie;
 import com.google.gson.Gson;
 
 import org.json.JSONArray;
