@@ -24,8 +24,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.focusandcode.popularmovies.Data.MoviesContract;
+import com.focusandcode.popularmovies.Entities.ListMovieReviews;
+import com.focusandcode.popularmovies.Entities.ListMovieVideos;
 import com.focusandcode.popularmovies.Entities.Movie;
-import com.focusandcode.popularmovies.adapters.RestClient;
 import com.squareup.picasso.Picasso;
 
 import butterknife.Bind;
@@ -41,6 +42,8 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     private Movie movie;
     private int mPosition;
     private Uri mUri = MoviesContract.MovieEntry.CONTENT_URI;
+    private ListMovieReviews movieReviews;
+    private ListMovieVideos movieVideos;
 
     @Bind(R.id.movie_backdr) ImageView movieBackdr;
     @Bind(R.id.movie_poster)ImageView imageView;
@@ -75,6 +78,16 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
         Intent intent = getActivity().getIntent();
         if (intent != null) {
             movie = intent.getExtras().getParcelable("movie");
+            Log.d(LOG_TAG, "Movie ID: " + movie.getId());
+
+            FetchVideosTask videosTask = new FetchVideosTask(movieVideos);
+            videosTask.execute(movie.getId() + "", Constants.API_KEY );
+
+            FetchReviewsTask reviewTask = new FetchReviewsTask(movieReviews);
+            reviewTask.execute(movie.getId() + "", Constants.API_KEY);
+
+
+
 
             StringBuilder builder = new StringBuilder();
             builder.append(Constants.IMAGE_BASE_URL)
@@ -269,7 +282,7 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     @Override
     public void onResume() {
         super.onResume();
-        new RestClient().runRetrofitTestSync(87101L);
+        //new RestClient().runRetrofitTestSync(Long.getLong(movie.getId() + "", 1L));
     }
 
 
