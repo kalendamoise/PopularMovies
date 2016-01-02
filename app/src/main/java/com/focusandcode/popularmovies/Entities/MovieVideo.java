@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 /**
  * Created by Moise2022 on 12/3/15.
  */
-public class MovieVideos {
+public class MovieVideo {
     private String id;
     @SerializedName("iso_639_1")
     private String iso6391;
@@ -80,7 +80,7 @@ public class MovieVideos {
 
     @Override
     public String toString() {
-        return "MovieVideos{" +
+        return "MovieVideo{" +
                 "id='" + id + '\'' +
                 ", iso6391='" + iso6391 + '\'' +
                 ", key='" + key + '\'' +

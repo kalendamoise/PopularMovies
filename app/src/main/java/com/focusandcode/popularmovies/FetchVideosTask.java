@@ -1,9 +1,11 @@
 package com.focusandcode.popularmovies;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.focusandcode.popularmovies.Entities.ListMovieVideos;
 import com.focusandcode.popularmovies.Services.MovieService;
+import com.focusandcode.popularmovies.adapters.MovieVideoAdapter;
 import com.focusandcode.popularmovies.adapters.RestClient;
 
 /**
@@ -11,10 +13,10 @@ import com.focusandcode.popularmovies.adapters.RestClient;
  */
 public class FetchVideosTask extends AsyncTask<String, Void, ListMovieVideos> {
     private final String LOG_TAG = FetchMovieTask.class.getSimpleName();
-    private ListMovieVideos movieVideos;
+    private MovieVideoAdapter adapter;
 
-    FetchVideosTask(ListMovieVideos movieVideos) {
-        this.movieVideos = movieVideos;
+    FetchVideosTask(MovieVideoAdapter adapter) {
+        this.adapter = adapter;
     }
 
 
@@ -38,7 +40,8 @@ public class FetchVideosTask extends AsyncTask<String, Void, ListMovieVideos> {
     @Override
     protected void onPostExecute(ListMovieVideos results) {
         if (results != null) {
-            this.movieVideos = results;
+            this.adapter.addAll(results.getResults());
+            Log.d(LOG_TAG, "Videos: " + results.getResults());
         }
     }
 

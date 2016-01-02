@@ -1,11 +1,13 @@
 package com.focusandcode.popularmovies;
 
+import android.content.ActivityNotFoundException;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -17,17 +19,26 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.focusandcode.popularmovies.Data.MoviesContract;
-import com.focusandcode.popularmovies.Entities.ListMovieReviews;
-import com.focusandcode.popularmovies.Entities.ListMovieVideos;
 import com.focusandcode.popularmovies.Entities.Movie;
+import com.focusandcode.popularmovies.Entities.MovieReview;
+import com.focusandcode.popularmovies.Entities.MovieVideo;
+import com.focusandcode.popularmovies.adapters.MovieReviewAdapter;
+import com.focusandcode.popularmovies.adapters.MovieVideoAdapter;
 import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -42,16 +53,27 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     private Movie movie;
     private int mPosition;
     private Uri mUri = MoviesContract.MovieEntry.CONTENT_URI;
-    private ListMovieReviews movieReviews;
-    private ListMovieVideos movieVideos;
+    private List<MovieReview> movieReviews = new ArrayList<MovieReview>();
+    private List<MovieVideo> movieVideos = new ArrayList<MovieVideo>();
 
-    @Bind(R.id.movie_backdr) ImageView movieBackdr;
-    @Bind(R.id.movie_poster)ImageView imageView;
-    @Bind(R.id.original_title) TextView originalTitle;
-    @Bind(R.id.release_date) TextView releaseDate;
-    @Bind(R.id.plot_synopsis) TextView plotSynopsis;
+    @Bind(R.id.list_movie_reviews)
+    ListView listMovieRevies;
+    @Bind(R.id.list_movie_videos)
+    ListView listMovieVideos;
+    @Bind(R.id.movie_backdr)
+    ImageView movieBackdr;
+    @Bind(R.id.movie_poster)
+    ImageView imageView;
+    @Bind(R.id.original_title)
+    TextView originalTitle;
+    @Bind(R.id.release_date)
+    TextView releaseDate;
+    @Bind(R.id.plot_synopsis)
+    TextView plotSynopsis;
     @Bind(R.id.add_to_favorite)
     ImageButton addToFavorite;
+    @Bind(R.id.collapsing_toolbar)
+    CollapsingToolbarLayout collapsingToolbar;
 
     public DetailActivityFragment() {
         setHasOptionsMenu(true);
@@ -80,12 +102,63 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
             movie = intent.getExtras().getParcelable("movie");
             Log.d(LOG_TAG, "Movie ID: " + movie.getId());
 
-            FetchVideosTask videosTask = new FetchVideosTask(movieVideos);
+            MovieVideoAdapter videoAdapter = new MovieVideoAdapter(getActivity(), R.layout.movie_videos, movieVideos);
+            listMovieVideos.setAdapter(videoAdapter);
+            listMovieVideos.setOnTouchListener(new View.OnTouchListener() {
+                // Setting on Touch Listener for handling the touch inside ScrollView
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    // Disallow the touch request for parent scroll on touch of child view
+                    v.getParent().requestDisallowInterceptTouchEvent(true);
+                    return false;
+                }
+            });
+
+            listMovieVideos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                    MovieVideo movieVideo = (MovieVideo) adapterView.getItemAtPosition(position);
+                    try{
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + movieVideo.getKey()));
+                        startActivity(intent);
+                    }catch (ActivityNotFoundException ex){
+                        Intent intent=new Intent(Intent.ACTION_VIEW,
+                                Uri.parse("http://www.youtube.com/watch?v="+movieVideo.getKey()));
+                        startActivity(intent);
+                    }
+                }
+            });
+
+            setListViewHeightBasedOnChildren(listMovieVideos);
+
+            FetchVideosTask videosTask = new FetchVideosTask(videoAdapter);
             videosTask.execute(movie.getId() + "", Constants.API_KEY );
+            videoAdapter.notifyDataSetChanged();
 
-            FetchReviewsTask reviewTask = new FetchReviewsTask(movieReviews);
+
+            MovieReviewAdapter reviewAdapter = new MovieReviewAdapter(getActivity(), R.layout.movie_reviews, movieReviews);
+            listMovieRevies.setAdapter(reviewAdapter);
+            listMovieRevies.setOnTouchListener(new View.OnTouchListener() {
+                // Setting on Touch Listener for handling the touch inside ScrollView
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    // Disallow the touch request for parent scroll on touch of child view
+                    v.getParent().requestDisallowInterceptTouchEvent(true);
+                    return false;
+                }
+            });
+
+            setListViewHeightBasedOnChildren(listMovieRevies);
+            FetchReviewsTask reviewTask = new FetchReviewsTask(reviewAdapter);
             reviewTask.execute(movie.getId() + "", Constants.API_KEY);
+            reviewAdapter.notifyDataSetChanged();
 
+            collapsingToolbar.setTitle(movie.getTitle());
+
+
+
+            Log.d(LOG_TAG, "List of reviews: " + reviewAdapter.getReviews().toString());
+            Log.d(LOG_TAG, "List of videos:  " + videoAdapter.getVideos().toString());
 
 
 
@@ -186,7 +259,7 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
 
     private Intent createShareForecastIntent() {
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
-        shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+        //shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
         shareIntent.setType("text/plain");
         shareIntent.putExtra(Intent.EXTRA_TEXT,
                 "Title: " + movie.getTitle() + " -- Synopsis: " + movie.getOverview());
@@ -285,32 +358,24 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
         //new RestClient().runRetrofitTestSync(Long.getLong(movie.getId() + "", 1L));
     }
 
+    public static void setListViewHeightBasedOnChildren(ListView listView) {
+        ListAdapter listAdapter = listView.getAdapter();
+        if (listAdapter == null)
+            return;
 
-    //    // insert data into database
-//    public void insertData(){
-//        ContentValues[] movieValuesArr = new ContentValues[1];
-//        // Loop through static array of Flavors, add each to an instance of ContentValues
-//        // in the array of ContentValues
-//        for(int i = 0; i < 1; i++){
-//            movieValuesArr[i] = new ContentValues();
-//            movieValuesArr[i].put( MoviesContract.MovieEntry.COLUMN_ORIGINAL_TITLE, movie.getOriginalTitle());
-//            movieValuesArr[i].put(MoviesContract.MovieEntry._ID, movie.getId());
-//            movieValuesArr[i].put(MoviesContract.MovieEntry.COLUMN_ADULT, movie.isAdult());
-//            movieValuesArr[i].put(MoviesContract.MovieEntry.COLUMN_BACKDROP_PATH, movie.getBackdropPath());
-//            movieValuesArr[i].put(MoviesContract.MovieEntry.COLUMN_ORIGINAL_LANGUAGE, movie.getOriginalLanguage());
-//            movieValuesArr[i].put(MoviesContract.MovieEntry.COLUMN_OVERVIEW, movie.getOverview());
-//            movieValuesArr[i].put(MoviesContract.MovieEntry.COLUMN_POPULARITY, movie.getPopularity());
-//            movieValuesArr[i].put(MoviesContract.MovieEntry.COLUMN_RELEASE_DATE, movie.getReleaseDate());
-//            movieValuesArr[i].put(MoviesContract.MovieEntry.COLUMN_POSTER_PATH, movie.getPosterPath());
-//            movieValuesArr[i].put(MoviesContract.MovieEntry.COLUMN_TITLE, movie.getTitle());
-//            movieValuesArr[i].put(MoviesContract.MovieEntry.COLUMN_VIDEO, movie.isVideo());
-//            movieValuesArr[i].put(MoviesContract.MovieEntry.COLUMN_VOTE_AVERAGE, movie.getVoteAverage());
-//            movieValuesArr[i].put(MoviesContract.MovieEntry.COLUMN_VOTE_COUNT, movie.getVoteCount());
-//
-//        }
-//
-//        // bulkInsert our ContentValues array
-//        getActivity().getContentResolver().bulkInsert(MoviesContract.MovieEntry.CONTENT_URI,
-//                movieValuesArr);
-//    }
+        int desiredWidth = View.MeasureSpec.makeMeasureSpec(listView.getWidth(), View.MeasureSpec.UNSPECIFIED);
+        int totalHeight = 0;
+        View view = null;
+        for (int i = 0; i < listAdapter.getCount(); i++) {
+            view = listAdapter.getView(i, view, listView);
+            if (i == 0) {
+                view.setLayoutParams(new ViewGroup.LayoutParams(desiredWidth, CollapsingToolbarLayout.LayoutParams.WRAP_CONTENT));
+            }
+            view.measure(desiredWidth, View.MeasureSpec.UNSPECIFIED);
+            totalHeight += view.getMeasuredHeight();
+        }
+        ViewGroup.LayoutParams params = listView.getLayoutParams();
+        params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
+        listView.setLayoutParams(params);
+    }
 }

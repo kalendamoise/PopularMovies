@@ -8,6 +8,7 @@ import android.widget.LinearLayout;
 import com.focusandcode.popularmovies.Entities.ListMovies;
 import com.focusandcode.popularmovies.Entities.Movie;
 import com.focusandcode.popularmovies.Services.MovieService;
+import com.focusandcode.popularmovies.adapters.GridViewAdapter;
 import com.focusandcode.popularmovies.adapters.RestClient;
 
 import java.util.List;

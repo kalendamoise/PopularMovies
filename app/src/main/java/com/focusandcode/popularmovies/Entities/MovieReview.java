@@ -3,7 +3,7 @@ package com.focusandcode.popularmovies.Entities;
 /**
  * Created by Moise2022 on 12/3/15.
  */
-public class MovieReviews {
+public class MovieReview {
 
     private String id;
     private String author;

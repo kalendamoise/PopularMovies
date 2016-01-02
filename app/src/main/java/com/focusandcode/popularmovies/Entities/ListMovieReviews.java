@@ -15,7 +15,7 @@ public class ListMovieReviews {
     private int totalPages;
     @SerializedName("total_results")
     private String totalResults;
-    private List<MovieReviews> results;
+    private List<MovieReview> results;
 
     public String getId() {
         return id;
@@ -49,11 +49,11 @@ public class ListMovieReviews {
         this.totalResults = totalResults;
     }
 
-    public List<MovieReviews> getResults() {
+    public List<MovieReview> getResults() {
         return results;
     }
 
-    public void setResults(List<MovieReviews> results) {
+    public void setResults(List<MovieReview> results) {
         this.results = results;
     }
 

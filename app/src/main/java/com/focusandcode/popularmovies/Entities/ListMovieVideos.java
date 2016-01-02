@@ -8,7 +8,7 @@ import java.util.List;
 
 public class ListMovieVideos {
     private String id;
-    private List<MovieVideos> results;
+    private List<MovieVideo> results;
 
     public String getId() {
         return id;
@@ -18,11 +18,11 @@ public class ListMovieVideos {
         this.id = id;
     }
 
-    public List<MovieVideos> getResults() {
+    public List<MovieVideo> getResults() {
         return results;
     }
 
-    public void setResults(List<MovieVideos> results) {
+    public void setResults(List<MovieVideo> results) {
         this.results = results;
     }
 

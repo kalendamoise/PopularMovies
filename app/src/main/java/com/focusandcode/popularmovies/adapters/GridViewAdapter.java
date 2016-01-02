@@ -1,4 +1,4 @@
-package com.focusandcode.popularmovies;
+package com.focusandcode.popularmovies.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -8,7 +8,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.focusandcode.popularmovies.Constants;
 import com.focusandcode.popularmovies.Entities.Movie;
+import com.focusandcode.popularmovies.R;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
