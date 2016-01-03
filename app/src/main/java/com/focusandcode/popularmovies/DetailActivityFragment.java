@@ -1,6 +1,5 @@
 package com.focusandcode.popularmovies;
 
-import android.content.ActivityNotFoundException;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -19,22 +18,23 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ListAdapter;
-import android.widget.ListView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.focusandcode.popularmovies.Data.MoviesContract;
+import com.focusandcode.popularmovies.Entities.ListMovieReviews;
+import com.focusandcode.popularmovies.Entities.ListMovieVideos;
 import com.focusandcode.popularmovies.Entities.Movie;
 import com.focusandcode.popularmovies.Entities.MovieReview;
 import com.focusandcode.popularmovies.Entities.MovieVideo;
+import com.focusandcode.popularmovies.Services.MovieService;
 import com.focusandcode.popularmovies.adapters.MovieReviewAdapter;
 import com.focusandcode.popularmovies.adapters.MovieVideoAdapter;
+import com.focusandcode.popularmovies.adapters.RestClient;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -43,11 +43,14 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 /**
  * A placeholder fragment containing a simple view.
  */
-public class DetailActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
+public class DetailActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final String LOG_TAG = DetailActivityFragment.class.getName();
     private static final int CURSOR_LOADER_ID = 0;
     private Movie movie;
@@ -56,10 +59,11 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     private List<MovieReview> movieReviews = new ArrayList<MovieReview>();
     private List<MovieVideo> movieVideos = new ArrayList<MovieVideo>();
 
-    @Bind(R.id.list_movie_reviews)
-    ListView listMovieRevies;
-    @Bind(R.id.list_movie_videos)
-    ListView listMovieVideos;
+
+    @Bind(R.id.reviews_container)
+    LinearLayout reviewContainer;
+    @Bind(R.id.videos_container)
+    LinearLayout videoContainer;
     @Bind(R.id.movie_backdr)
     ImageView movieBackdr;
     @Bind(R.id.movie_poster)
@@ -91,6 +95,22 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
         return fragment;
     }
 
+    public void launchYouTube(View view) {
+
+        Log.d(LOG_TAG, "The tag is: " + view.getTag().toString());
+
+//        MovieVideo movieVideo = (MovieVideo) adapterView.getItemAtPosition(position);
+//        try {
+//            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + movieVideo.getKey()));
+//            startActivity(intent);
+//        } catch (ActivityNotFoundException ex) {
+//            Intent intent = new Intent(Intent.ACTION_VIEW,
+//                    Uri.parse("http://www.youtube.com/watch?v=" + movieVideo.getKey()));
+//            startActivity(intent);
+//        }
+    }
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -102,63 +122,15 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
             movie = intent.getExtras().getParcelable("movie");
             Log.d(LOG_TAG, "Movie ID: " + movie.getId());
 
-            MovieVideoAdapter videoAdapter = new MovieVideoAdapter(getActivity(), R.layout.movie_videos, movieVideos);
-            listMovieVideos.setAdapter(videoAdapter);
-            listMovieVideos.setOnTouchListener(new View.OnTouchListener() {
-                // Setting on Touch Listener for handling the touch inside ScrollView
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    // Disallow the touch request for parent scroll on touch of child view
-                    v.getParent().requestDisallowInterceptTouchEvent(true);
-                    return false;
-                }
-            });
+            MovieService movieService = RestClient.getMovieService();
+            // Fetch reviews and videos
+            movieService.getMovieVideos((long) movie.getId(), Constants.API_KEY, movieVideosCallback);
+            movieService.getMovieReviews((long) movie.getId(), Constants.API_KEY, movieReviewsCallback);
 
-            listMovieVideos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                    MovieVideo movieVideo = (MovieVideo) adapterView.getItemAtPosition(position);
-                    try{
-                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + movieVideo.getKey()));
-                        startActivity(intent);
-                    }catch (ActivityNotFoundException ex){
-                        Intent intent=new Intent(Intent.ACTION_VIEW,
-                                Uri.parse("http://www.youtube.com/watch?v="+movieVideo.getKey()));
-                        startActivity(intent);
-                    }
-                }
-            });
-
-            setListViewHeightBasedOnChildren(listMovieVideos);
-
-            FetchVideosTask videosTask = new FetchVideosTask(videoAdapter);
-            videosTask.execute(movie.getId() + "", Constants.API_KEY );
-            videoAdapter.notifyDataSetChanged();
-
-
-            MovieReviewAdapter reviewAdapter = new MovieReviewAdapter(getActivity(), R.layout.movie_reviews, movieReviews);
-            listMovieRevies.setAdapter(reviewAdapter);
-            listMovieRevies.setOnTouchListener(new View.OnTouchListener() {
-                // Setting on Touch Listener for handling the touch inside ScrollView
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    // Disallow the touch request for parent scroll on touch of child view
-                    v.getParent().requestDisallowInterceptTouchEvent(true);
-                    return false;
-                }
-            });
-
-            setListViewHeightBasedOnChildren(listMovieRevies);
-            FetchReviewsTask reviewTask = new FetchReviewsTask(reviewAdapter);
-            reviewTask.execute(movie.getId() + "", Constants.API_KEY);
-            reviewAdapter.notifyDataSetChanged();
 
             collapsingToolbar.setTitle(movie.getTitle());
 
 
-
-            Log.d(LOG_TAG, "List of reviews: " + reviewAdapter.getReviews().toString());
-            Log.d(LOG_TAG, "List of videos:  " + videoAdapter.getVideos().toString());
 
 
 
@@ -170,7 +142,7 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
                     .append(movie.getBackdropPath());
             String uri = builder.toString();
 
-            Log.d(LOG_TAG, "Backdrop URL: " + uri );
+            Log.d(LOG_TAG, "Backdrop URL: " + uri);
 
             final Context context = getActivity().getApplicationContext();
 
@@ -193,8 +165,6 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
             Log.d(LOG_TAG, "Movie ID: " + movie.getId());
 
 
-
-
             Picasso.with(context)
                     .load(uri)
                     .placeholder(R.mipmap.ic_launcher)
@@ -204,7 +174,7 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
 
             originalTitle.setText(movie.getOriginalTitle());
 
-            releaseDate.setText( movie.getReleaseDate().trim());
+            releaseDate.setText(movie.getReleaseDate().trim());
             plotSynopsis.setText(movie.getOverview());
 
 
@@ -217,7 +187,7 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
 
         // check to see if the movie is present in the database and toggle the favorite image button accordingly.
         String selection = MoviesContract.MovieEntry._ID;
-        String [] selectionArgs = new String[]{String.valueOf(movie.getId())};
+        String[] selectionArgs = new String[]{String.valueOf(movie.getId())};
         Cursor cursor = getActivity().getContentResolver().query(MoviesContract.MovieEntry.buildFlavorsUri(movie.getId()), null, selection, selectionArgs, null);
 
         if (cursor.getCount() == 0) {
@@ -265,12 +235,13 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
                 "Title: " + movie.getTitle() + " -- Synopsis: " + movie.getOverview());
         return shareIntent;
     }
+
     @OnClick(R.id.add_to_favorite)
     public void addToFavorite(View view) {
 
 
         String selection = MoviesContract.MovieEntry._ID;
-        String [] selectionArgs = new String[]{String.valueOf(movie.getId())};
+        String[] selectionArgs = new String[]{String.valueOf(movie.getId())};
 
 
         Cursor cursor = getActivity().getContentResolver().query(MoviesContract.MovieEntry.buildFlavorsUri(movie.getId()), null, selection, selectionArgs, null);
@@ -301,7 +272,7 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
         } else {
             Log.d(LOG_TAG, "This movie is already in the database. The count was: " + cursor.getCount());
             addToFavorite.setImageResource(android.R.drawable.btn_star_big_off);
-            int rowDeleted = getActivity().getContentResolver().delete(MoviesContract.MovieEntry.CONTENT_URI, MoviesContract.MovieEntry._ID  +" = "+ movie.getId(), null);
+            int rowDeleted = getActivity().getContentResolver().delete(MoviesContract.MovieEntry.CONTENT_URI, MoviesContract.MovieEntry._ID + " = " + movie.getId(), null);
             if (rowDeleted > 0) {
                 Log.d(LOG_TAG, "The movie " + movie.getTitle() + " was successfully remove from favorite.");
             }
@@ -312,8 +283,8 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String selection = null;
-        String [] selectionArgs = null;
-        if (args != null){
+        String[] selectionArgs = null;
+        if (args != null) {
             selection = MoviesContract.MovieEntry._ID;
             selectionArgs = new String[]{String.valueOf(movie.getId())};
         }
@@ -326,14 +297,14 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState){
+    public void onActivityCreated(Bundle savedInstanceState) {
         Cursor c =
                 getActivity().getContentResolver().query(MoviesContract.MovieEntry.CONTENT_URI,
                         new String[]{MoviesContract.MovieEntry._ID},
                         null,
                         null,
                         null);
-        if (c.getCount() == 0){
+        if (c.getCount() == 0) {
             //insertData();
         }
         // initialize loader
@@ -358,24 +329,60 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
         //new RestClient().runRetrofitTestSync(Long.getLong(movie.getId() + "", 1L));
     }
 
-    public static void setListViewHeightBasedOnChildren(ListView listView) {
-        ListAdapter listAdapter = listView.getAdapter();
-        if (listAdapter == null)
-            return;
 
-        int desiredWidth = View.MeasureSpec.makeMeasureSpec(listView.getWidth(), View.MeasureSpec.UNSPECIFIED);
-        int totalHeight = 0;
-        View view = null;
-        for (int i = 0; i < listAdapter.getCount(); i++) {
-            view = listAdapter.getView(i, view, listView);
-            if (i == 0) {
-                view.setLayoutParams(new ViewGroup.LayoutParams(desiredWidth, CollapsingToolbarLayout.LayoutParams.WRAP_CONTENT));
+    private Callback<ListMovieReviews> movieReviewsCallback = new Callback<ListMovieReviews>() {
+        @Override
+        public void success(ListMovieReviews data, Response response) {
+            Log.d(LOG_TAG, "Reviews: " + data.toString());
+            movieReviews = data.getResults();
+            for (int i = 0; i < movieReviews.size(); i++) {
+                MovieReview review = movieReviews.get(i);
+                reviewContainer.addView(buildReview(review));
             }
-            view.measure(desiredWidth, View.MeasureSpec.UNSPECIFIED);
-            totalHeight += view.getMeasuredHeight();
         }
-        ViewGroup.LayoutParams params = listView.getLayoutParams();
-        params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
-        listView.setLayoutParams(params);
+
+        @Override
+        public void failure(RetrofitError error) {
+            Log.d(LOG_TAG, "failure: " + error);
+        }
+    };
+
+    private Callback<ListMovieVideos> movieVideosCallback = new Callback<ListMovieVideos>() {
+        @Override
+        public void success(ListMovieVideos data, Response response) {
+            Log.d(LOG_TAG, "Videos: " + data.toString());
+            movieVideos = data.getResults();
+            for (int i = 0; i < movieVideos.size(); i++) {
+                MovieVideo video = movieVideos.get(i);
+                videoContainer.addView(buildVideo(video));
+            }
+        }
+
+        @Override
+        public void failure(RetrofitError error) {
+            Log.d(LOG_TAG, "failure: " + error);
+        }
+    };
+
+
+    public View buildReview (MovieReview review) {
+        View reviewView = getActivity().getLayoutInflater()
+                .inflate(R.layout.movie_reviews, null);
+        MovieReviewAdapter.ViewHolder viewHolder = new MovieReviewAdapter.ViewHolder(reviewView);
+        viewHolder.authorTextView.setText(review.getAuthor());
+        viewHolder.contentTextView.setText(review.getContent());
+        return reviewView;
+    }
+
+    public View buildVideo (MovieVideo video) {
+
+        View videoView = getActivity().getLayoutInflater()
+                .inflate(R.layout.movie_videos, null);
+
+        MovieVideoAdapter.ViewHolder viewHolder = new MovieVideoAdapter.ViewHolder(videoView);
+        viewHolder.titleTextView.setText(video.getName());
+        viewHolder.imageButton.setTag(video.getKey());
+
+        return videoView;
     }
 }

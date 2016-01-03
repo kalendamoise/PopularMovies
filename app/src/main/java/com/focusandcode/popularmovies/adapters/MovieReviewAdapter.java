@@ -60,8 +60,8 @@ public class MovieReviewAdapter extends ArrayAdapter<MovieReview> {
 
 
     public static class ViewHolder {
-        @Bind(R.id.list_item_review_content)  TextView contentTextView;
-        @Bind(R.id.list_item_review_author)  TextView authorTextView;
+        @Bind(R.id.list_item_review_content)  public TextView contentTextView;
+        @Bind(R.id.list_item_review_author)  public TextView authorTextView;
 
         public ViewHolder(View view) {
             ButterKnife.bind(this, view);

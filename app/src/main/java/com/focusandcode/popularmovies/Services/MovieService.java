@@ -5,6 +5,7 @@ import com.focusandcode.popularmovies.Entities.ListMovieReviews;
 import com.focusandcode.popularmovies.Entities.ListMovieVideos;
 import com.focusandcode.popularmovies.Entities.ListMovies;
 
+import retrofit.Callback;
 import retrofit.http.GET;
 import retrofit.http.Path;
 import retrofit.http.Query;
@@ -17,8 +18,14 @@ public interface MovieService {
     ListMovies getMovies(@Query(Constants.SORT_ORDER_PARAM) String sortBy, @Query(Constants.API_KEY_PARAM) String api_key, @Query(Constants.PAGE) String page);
 
     @GET("/movie/{id}/videos")
-    ListMovieVideos getMovieVideos(@Path("id") String id, @Query(Constants.API_KEY_PARAM) String api_key /*, Callback<ListMovieVideos> callback*/);
+    ListMovieVideos getMovieVideos(@Path("id") String id, @Query(Constants.API_KEY_PARAM) String api_key);
+
+    @GET("/movie/{id}/videos")
+    void getMovieVideos(@Path("id") Long id, @Query(Constants.API_KEY_PARAM) String api_key, Callback<ListMovieVideos> callback);
 
     @GET("/movie/{id}/reviews")
-    ListMovieReviews getMovieReviews(@Path("id") String id, @Query(Constants.API_KEY_PARAM) String api_key /*, Callback<ListMovieReviews> callback*/);
+    ListMovieReviews getMovieReviews(@Path("id") String id, @Query(Constants.API_KEY_PARAM) String api_key);
+
+    @GET("/movie/{id}/reviews")
+    void getMovieReviews(@Path("id") Long id, @Query(Constants.API_KEY_PARAM) String api_key, Callback<ListMovieReviews> callback);
 }

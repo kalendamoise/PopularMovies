@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.focusandcode.popularmovies.Entities.MovieVideo;
@@ -52,12 +53,16 @@ public class MovieVideoAdapter extends ArrayAdapter<MovieVideo> {
         MovieVideo movie = getItem(position);
         if (movie != null) {
             holder.titleTextView.setText(movie.getName());
+            holder.videoKey.setText(movie.getKey());
+            holder.imageButton.setTag(movie.getKey());
         }
         return row;
     }
 
     public static class ViewHolder {
-        @Bind(R.id.list_item_video_title) TextView titleTextView;
+        @Bind(R.id.list_item_video_title) public TextView titleTextView;
+        @Bind(R.id.list_item_video_key) public TextView videoKey;
+        @Bind(R.id.list_item_video_image) public ImageButton imageButton;
 
         public ViewHolder(View view) {
             ButterKnife.bind(this, view);
