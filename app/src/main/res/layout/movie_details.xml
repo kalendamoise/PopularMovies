@@ -34,7 +34,7 @@
             android:divider="?android:dividerHorizontal"
             android:orientation="horizontal">
 
-            <com.focusandcode.popularmovies.SquareImageView
+            <com.focusandcode.popularmovies.utils.SquareImageView
                 android:id="@+id/movie_poster"
                 android:layout_width="150dp"
                 android:layout_height="150dp"

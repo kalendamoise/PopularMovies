@@ -25,7 +25,9 @@ import android.widget.TextView;
 
 import com.focusandcode.popularmovies.Data.MoviesContract;
 import com.focusandcode.popularmovies.Entities.Movie;
+import com.focusandcode.popularmovies.Task.FetchMovieTask;
 import com.focusandcode.popularmovies.adapters.GridViewAdapter;
+import com.focusandcode.popularmovies.utils.NetworkUtil;
 
 import java.util.ArrayList;
 import java.util.List;

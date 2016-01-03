@@ -1,4 +1,4 @@
-package com.focusandcode.popularmovies;
+package com.focusandcode.popularmovies.Task;
 
 
 import android.os.AsyncTask;
@@ -22,7 +22,7 @@ public class FetchMovieTask  extends AsyncTask<String, Void, List<Movie>> {
     private GridViewAdapter adapter;
     private LinearLayout spinnerView;
 
-    FetchMovieTask(GridViewAdapter adapter, LinearLayout spinerView) {
+    public FetchMovieTask(GridViewAdapter adapter, LinearLayout spinerView) {
         this.adapter = adapter;
         this.spinnerView = spinerView;
 

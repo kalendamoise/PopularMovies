@@ -1,4 +1,4 @@
-package com.focusandcode.popularmovies;
+package com.focusandcode.popularmovies.utils;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
