@@ -12,6 +12,7 @@ import com.facebook.stetho.Stetho;
 public class MainActivity extends AppCompatActivity {
     private static final String LOG_TAG = MainActivity.class.getName();
 
+
     @Override
     public void onStart() {
         super.onStart();
@@ -37,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
                         .enableWebKitInspector(
                                 Stetho.defaultInspectorModulesProvider(this))
                         .build());
+
 
     }
 
