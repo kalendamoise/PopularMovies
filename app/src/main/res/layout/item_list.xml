@@ -3,11 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/item_list"
-    android:name="com.focusandcode.popularmovie2.ItemListFragment"
+    android:name="com.focusandcode.popularmovies.MainActivityFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginLeft="16dp"
-    android:layout_marginRight="16dp"
+    android:layout_marginLeft="0dp"
+    android:layout_marginRight="0dp"
     app:layoutManager="LinearLayoutManager"
-    tools:context="com.focusandcode.popularmovies.ItemListActivity"
-    tools:listitem="@layout/item_list_content" />
+    tools:context="com.focusandcode.popularmovies.MainActivity"
+    tools:listitem="@layout/gridview_layout" />
+    <!--tools:listitem="@layout/item_list_content"-->

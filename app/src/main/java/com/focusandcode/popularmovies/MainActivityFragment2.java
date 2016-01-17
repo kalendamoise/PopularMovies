@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -38,9 +39,16 @@ import butterknife.ButterKnife;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainActivityFragment extends Fragment {
-    private static final String LOG_TAG = MainActivityFragment.class.getName();
+public class MainActivityFragment2 extends Fragment {
+    /**
+     * Whether or not the activity is in two-pane mode, i.e. running on a tablet
+     * device.
+     */
+    private boolean mTwoPane;
+
+    private static final String LOG_TAG = MainActivityFragment2.class.getName();
     private GridViewAdapter adapter;
+    private RecyclerView mRecyclerView;
     private List<Movie> movies = new ArrayList<Movie>();
     private Parcelable state;
     @Bind(R.id.gridview) GridView gridview;
@@ -51,7 +59,7 @@ public class MainActivityFragment extends Fragment {
     private NetworkChangeReceiver broadcastReceiver = new NetworkChangeReceiver();
 
 
-    public MainActivityFragment() {
+    public MainActivityFragment2() {
     }
 
     @Override
@@ -83,21 +91,32 @@ public class MainActivityFragment extends Fragment {
 
         context = getActivity().getApplicationContext();
 
-        updateUI(inflater, container);
+        View rootView = inflater.inflate(R.layout.activity_main, container, false);
+        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.item_list);
 
-        return rootView;
-    }
 
-    private void updateUI(LayoutInflater inflater, ViewGroup container) {
+
         Log.d(LOG_TAG, "Updating the UI");
 
         rootView = inflater.inflate(R.layout.fragment_main, container, false);
         ButterKnife.bind(this, rootView);
 
 
-        adapter = new GridViewAdapter(context, R.layout.gridview_layout, movies);
+        if (getActivity().findViewById(R.id.item_detail_container) != null) {
+            // The detail container view will be present only in the
+            // large-screen layouts (res/values-w900dp).
+            // If this view is present, then the
+            // activity should be in two-pane mode.
+            mTwoPane = true;
+        }
+        adapter =(GridViewAdapter) mRecyclerView.getAdapter();
+        if (adapter == null) {
+            adapter = new GridViewAdapter(context, movies, mTwoPane, getFragmentManager());
+            mRecyclerView.setAdapter(adapter);
+        }
 
-        gridview.setAdapter(adapter);
+
+
 
 
         gridview.setOnScrollListener(new EndlessScrollListener() {
@@ -135,7 +154,11 @@ public class MainActivityFragment extends Fragment {
         }
 
         fetchData();
+
+        return rootView;
     }
+
+
 
 
     @Override
@@ -182,9 +205,6 @@ public class MainActivityFragment extends Fragment {
 
         Log.d(LOG_TAG, "SortOrder: " + sortOrder);
 
-        if (adapter == null) {
-            adapter = new GridViewAdapter(getActivity(), R.layout.gridview_layout, movies);
-        }
         adapter.getMovies().clear();
 
         if (sortOrder.equals("favorite")) {
@@ -234,7 +254,7 @@ public class MainActivityFragment extends Fragment {
         Log.d(LOG_TAG, "SortOrder: " + sortOrder);
 
         if (adapter == null) {
-            adapter = new GridViewAdapter(getActivity(), R.layout.gridview_layout, movies);
+            adapter = new GridViewAdapter(context, movies, false, getFragmentManager());;
         }
 
         if (sortOrder.equals("favorite")) {

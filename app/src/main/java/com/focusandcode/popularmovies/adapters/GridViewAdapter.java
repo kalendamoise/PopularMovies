@@ -1,14 +1,20 @@
 package com.focusandcode.popularmovies.adapters;
 
 import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.focusandcode.popularmovies.Constants;
+import com.focusandcode.popularmovies.DetailActivity;
+import com.focusandcode.popularmovies.DetailActivityFragment;
 import com.focusandcode.popularmovies.Entities.Movie;
 import com.focusandcode.popularmovies.R;
 import com.squareup.picasso.Picasso;
@@ -21,7 +27,101 @@ import butterknife.ButterKnife;
 /**
  * Created by Moise2022 on 9/25/15.
  */
-public class GridViewAdapter  extends ArrayAdapter<Movie> {
+public class GridViewAdapter extends RecyclerView.Adapter<GridViewAdapter.ViewHolder> {
+    private static final String LOG_TAG = GridViewAdapter.class.getName();
+    private List<Movie> movies;
+    private Context context;
+    private boolean twoPane;
+    private FragmentManager fragmentManager;
+
+
+    public GridViewAdapter(Context context, List<Movie> movies, boolean mTwoPane, FragmentManager fragmentManager){
+        this.movies = movies;
+        this.context = context;
+        this.twoPane = mTwoPane;
+        this.fragmentManager = fragmentManager;
+    }
+
+    @Override
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.gridview_layout, parent, false);
+        return new ViewHolder(view);
+    }
+
+    @Override
+    public void onBindViewHolder(final ViewHolder holder, int position) {
+        holder.movie = movies.get(position);
+
+
+        StringBuilder builder = new StringBuilder();
+        builder.append(Constants.IMAGE_BASE_URL)
+                    .append(Constants.SEPARATOR)
+                    .append(Constants.IMAGE_SIZE)
+                    .append(Constants.SEPARATOR)
+                    .append(holder.movie.getPosterPath());
+        String uri = builder.toString();
+
+
+        Picasso.with(context)
+                        .load(uri)
+                        .placeholder(R.mipmap.ic_launcher)
+                        .error(R.mipmap.ic_launcher)
+                        .into(holder.image);
+        holder.imageTitle.setText(holder.movie.getTitle());
+
+        holder.mView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(LOG_TAG, "the twoPane is " + twoPane);
+                if (twoPane) {
+                    Bundle arguments = new Bundle();
+                    arguments.putParcelable(DetailActivityFragment.ARG_ITEM_ID, holder.movie );
+                    DetailActivityFragment fragment = new DetailActivityFragment();
+                    fragment.setArguments(arguments);
+                    fragmentManager.beginTransaction()
+                            .add(R.id.item_detail_container, fragment)
+                            .commit();
+                } else {
+                    Context context = v.getContext();
+                    Intent intent = new Intent(context, DetailActivity.class);
+                    intent.putExtra("movie", holder.movie);
+                    context.startActivity(intent);
+                }
+            }
+        });
+
+    }
+
+    @Override
+    public int getItemCount() {
+        return movies.size();
+    }
+
+    public List<Movie> getMovies() {
+        return movies;
+    }
+
+
+    public class ViewHolder extends RecyclerView.ViewHolder {
+        public final View mView;
+        @Bind(R.id.title) TextView imageTitle;
+        @Bind(R.id.imageView) ImageView image;
+        public Movie movie;
+
+        public ViewHolder(View view) {
+            super(view);
+            mView = view;
+            ButterKnife.bind(this, view);
+        }
+
+        @Override
+        public String toString() {
+            return super.toString() + " '" + imageTitle.getText() + "'";
+        }
+    }
+
+        /*ArrayAdapter<Movie> {
     private static final String LOG_TAG = GridViewAdapter.class.getName();
 
     private List<Movie> movies;
@@ -78,7 +178,7 @@ public class GridViewAdapter  extends ArrayAdapter<Movie> {
     }
 
 
-    static class ViewHolder {
+    static class ViewHolder  {
         @Bind(R.id.title) TextView imageTitle;
         @Bind(R.id.imageView) ImageView image;
 
@@ -86,4 +186,5 @@ public class GridViewAdapter  extends ArrayAdapter<Movie> {
             ButterKnife.bind(this, view);
         }
     }
+    */
 }

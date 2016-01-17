@@ -50,11 +50,7 @@ public class FetchMovieTask  extends AsyncTask<String, Void, List<Movie>> {
         if (spinnerView != null) {
             spinnerView.setVisibility(View.GONE);
         }
-        if (results != null) {
-            for(Movie movie : results) {
-                adapter.add(movie);
-            }
-        }
+        adapter.getMovies().addAll(results);
     }
 
     @Override

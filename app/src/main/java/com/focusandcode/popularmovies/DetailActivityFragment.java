@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -51,6 +50,7 @@ import retrofit.client.Response;
  * A placeholder fragment containing a simple view.
  */
 public class DetailActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+    public static final String ARG_ITEM_ID = "movie";
     private static final String LOG_TAG = DetailActivityFragment.class.getName();
     private static final int CURSOR_LOADER_ID = 0;
     private Movie movie;
@@ -64,8 +64,6 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     LinearLayout reviewContainer;
     @Bind(R.id.videos_container)
     LinearLayout videoContainer;
-    @Bind(R.id.movie_backdr)
-    ImageView movieBackdr;
     @Bind(R.id.movie_poster)
     ImageView imageView;
     @Bind(R.id.original_title)
@@ -76,8 +74,7 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     TextView plotSynopsis;
     @Bind(R.id.add_to_favorite)
     ImageButton addToFavorite;
-    @Bind(R.id.collapsing_toolbar)
-    CollapsingToolbarLayout collapsingToolbar;
+
 
     public DetailActivityFragment() {
         setHasOptionsMenu(true);
@@ -117,9 +114,9 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
         ButterKnife.bind(this, rootView);
 
-        Intent intent = getActivity().getIntent();
-        if (intent != null) {
-            movie = intent.getExtras().getParcelable("movie");
+
+        if (getArguments().containsKey(ARG_ITEM_ID)) {
+            movie = getArguments().getParcelable(ARG_ITEM_ID);
             Log.d(LOG_TAG, "Movie ID: " + movie.getId());
 
             MovieService movieService = RestClient.getMovieService();
@@ -127,39 +124,44 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
             movieService.getMovieVideos((long) movie.getId(), Constants.API_KEY, movieVideosCallback);
             movieService.getMovieReviews((long) movie.getId(), Constants.API_KEY, movieReviewsCallback);
 
+            final Context context = getActivity().getApplicationContext();
 
-            collapsingToolbar.setTitle(movie.getTitle());
+//            Activity activity = this.getActivity();
+//            CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
+//            if (appBarLayout != null) {
+//                appBarLayout.setTitle(movie.getTitle());
+//            }
+            //collapsingToolbar.setTitle(movie.getTitle());
 
-
-
-
+//            ImageView movieBackdr = (ImageView) activity.findViewById(R.id.movie_backdr);
+//
+//
+//
+//            StringBuilder builder = new StringBuilder();
+//            builder.append(Constants.IMAGE_BASE_URL)
+//                    .append(Constants.SEPARATOR)
+//                    .append(Constants.IMAGE_SIZE)
+//                    .append(Constants.SEPARATOR)
+//                    .append(movie.getBackdropPath());
+//            String uri = builder.toString();
+//
+//            Log.d(LOG_TAG, "Backdrop URL: " + uri);
+//
+//            final Context context = getActivity().getApplicationContext();
+//
+//            Picasso.with(context)
+//                    .load(uri)
+//                    .placeholder(R.mipmap.ic_launcher)
+//                    .error(R.mipmap.ic_launcher)
+//                    .into(movieBackdr);
 
             StringBuilder builder = new StringBuilder();
             builder.append(Constants.IMAGE_BASE_URL)
                     .append(Constants.SEPARATOR)
                     .append(Constants.IMAGE_SIZE)
                     .append(Constants.SEPARATOR)
-                    .append(movie.getBackdropPath());
-            String uri = builder.toString();
-
-            Log.d(LOG_TAG, "Backdrop URL: " + uri);
-
-            final Context context = getActivity().getApplicationContext();
-
-            Picasso.with(context)
-                    .load(uri)
-                    .placeholder(R.mipmap.ic_launcher)
-                    .error(R.mipmap.ic_launcher)
-                    .into(movieBackdr);
-
-
-            builder = new StringBuilder();
-            builder.append(Constants.IMAGE_BASE_URL)
-                    .append(Constants.SEPARATOR)
-                    .append(Constants.IMAGE_SIZE)
-                    .append(Constants.SEPARATOR)
                     .append(movie.getPosterPath());
-            uri = builder.toString();
+            String uri = builder.toString();
 
             Log.d(LOG_TAG, "Poster URL: " + uri);
             Log.d(LOG_TAG, "Movie ID: " + movie.getId());

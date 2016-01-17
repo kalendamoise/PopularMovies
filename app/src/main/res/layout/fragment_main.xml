@@ -15,7 +15,7 @@
         android:stretchMode="columnWidth"
         android:numColumns="auto_fit"/>
 
-    <LinearLayout
+    <LinxearLayout
         android:id="@+id/linlaProgressBar"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
@@ -27,7 +27,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="2dp" />
-    </LinearLayout>
+    </LinxearLayout>
     <TextView
         android:id="@+id/tv_no_data"
         android:layout_width="fill_parent"
