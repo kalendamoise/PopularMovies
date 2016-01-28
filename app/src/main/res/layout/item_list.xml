@@ -11,4 +11,3 @@
     app:layoutManager="LinearLayoutManager"
     tools:context="com.focusandcode.popularmovies.MainActivity"
     tools:listitem="@layout/gridview_layout" />
-    <!--tools:listitem="@layout/item_list_content"-->

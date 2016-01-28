@@ -1,4 +1,4 @@
-package com.focusandcode.popularmovies;
+package com.focusandcode.popularmovies.utils;
 
 /**
  * Created by Moise2022 on 9/24/15.

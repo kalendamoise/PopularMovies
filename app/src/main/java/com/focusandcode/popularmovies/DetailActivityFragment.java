@@ -34,6 +34,7 @@ import com.focusandcode.popularmovies.Services.MovieService;
 import com.focusandcode.popularmovies.adapters.MovieReviewAdapter;
 import com.focusandcode.popularmovies.adapters.MovieVideoAdapter;
 import com.focusandcode.popularmovies.adapters.RestClient;
+import com.focusandcode.popularmovies.utils.Constants;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -197,7 +198,6 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
         } else {
             addToFavorite.setImageResource(android.R.drawable.btn_star_big_on);
         }
-
 
         return rootView;
     }

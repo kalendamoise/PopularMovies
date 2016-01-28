@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.focusandcode.popularmovies.Constants;
+import com.focusandcode.popularmovies.utils.Constants;
 import com.focusandcode.popularmovies.DetailActivity;
 import com.focusandcode.popularmovies.DetailActivityFragment;
 import com.focusandcode.popularmovies.Entities.Movie;
@@ -79,13 +79,18 @@ public class GridViewAdapter extends RecyclerView.Adapter<GridViewAdapter.ViewHo
                     arguments.putParcelable(DetailActivityFragment.ARG_ITEM_ID, holder.movie );
                     DetailActivityFragment fragment = new DetailActivityFragment();
                     fragment.setArguments(arguments);
+                    if (fragmentManager.getFragments() != null) {
+                        fragmentManager.getFragments().remove(0);
+                    }
+
                     fragmentManager.beginTransaction()
-                            .add(R.id.item_detail_container, fragment)
+                            .replace(R.id.item_detail_container, fragment)
+                            .addToBackStack(null)
                             .commit();
                 } else {
                     Context context = v.getContext();
                     Intent intent = new Intent(context, DetailActivity.class);
-                    intent.putExtra("movie", holder.movie);
+                    intent.putExtra(DetailActivityFragment.ARG_ITEM_ID, holder.movie);
                     context.startActivity(intent);
                 }
             }

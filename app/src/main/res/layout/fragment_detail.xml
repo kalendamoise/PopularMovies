@@ -1,5 +1,13 @@
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    xmlns:app="http://schemas.android.com/apk/res-auto" >
+
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/detail_linear_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -157,6 +165,9 @@
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
         android:padding="3dp"
+        android:layout_marginBottom="@dimen/card_margin"
+        android:layout_marginLeft="@dimen/card_margin"
+        android:layout_marginRight="@dimen/card_margin"
         android:text="Videos"
         android:textColor="@color/window_background" />
 
@@ -174,6 +185,9 @@
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
         android:padding="3dp"
+        android:layout_marginBottom="@dimen/card_margin"
+        android:layout_marginLeft="@dimen/card_margin"
+        android:layout_marginRight="@dimen/card_margin"
         android:text="Reviews"
         android:textColor="@color/window_background" />
 
@@ -186,3 +200,4 @@
         android:padding="10dp" />
 
 </LinearLayout>
+</android.support.v4.widget.NestedScrollView>

@@ -1,11 +1,13 @@
 package com.focusandcode.popularmovies;
 
 import android.annotation.TargetApi;
+import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -18,12 +20,14 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageButton;
 
-import com.facebook.stetho.Stetho;
 import com.focusandcode.popularmovies.Data.MoviesContract;
 import com.focusandcode.popularmovies.Entities.Movie;
 import com.focusandcode.popularmovies.Task.FetchMovieTask;
 import com.focusandcode.popularmovies.adapters.GridViewAdapter;
+import com.focusandcode.popularmovies.utils.Constants;
 import com.focusandcode.popularmovies.utils.NetworkUtil;
 
 import java.util.ArrayList;
@@ -48,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
     @Bind(R.id.item_list)
     RecyclerView recyclerView;
 
+
     private NetworkChangeReceiver broadcastReceiver = new NetworkChangeReceiver();
 
 
@@ -70,8 +75,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
 
-        assert recyclerView != null;
-        setupRecyclerView(recyclerView);
+
 
         if (findViewById(R.id.item_detail_container) != null) {
             // The detail container view will be present only in the
@@ -79,7 +83,12 @@ public class MainActivity extends AppCompatActivity {
             // If this view is present, then the
             // activity should be in two-pane mode.
             twoPane = true;
+            Log.d(LOG_TAG, "the twoPane is " + twoPane);
         }
+
+        assert recyclerView != null;
+        setupRecyclerView(recyclerView);
+
 
         if (state != null) {
             Log.d(LOG_TAG, "trying to restore listview state..");
@@ -94,13 +103,13 @@ public class MainActivity extends AppCompatActivity {
         // The code below integrates Stetho into your app. More information here:
         // http://facebook.github.io/stetho/
 
-        Stetho.initialize(
-                Stetho.newInitializerBuilder(this)
-                        .enableDumpapp(
-                                Stetho.defaultDumperPluginsProvider(this))
-                        .enableWebKitInspector(
-                                Stetho.defaultInspectorModulesProvider(this))
-                        .build());
+//        Stetho.initialize(
+//                Stetho.newInitializerBuilder(this)
+//                        .enableDumpapp(
+//                                Stetho.defaultDumperPluginsProvider(this))
+//                        .enableWebKitInspector(
+//                                Stetho.defaultInspectorModulesProvider(this))
+//                        .build());
 
 
     }
@@ -237,6 +246,28 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    public void launchYouTube(View view) {
+        if (view == null) {
+            Log.d(LOG_TAG, "There are no tag the view is null. ");
+        } else {
+            ImageButton button = (ImageButton) view;
+            String key = button.getTag().toString();
+            Log.d(LOG_TAG, "The tag is: " + button.getTag());
+
+
+            try {
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + key))
+                        ;
+                startActivity(intent);
+            } catch (ActivityNotFoundException ex) {
+                Intent intent = new Intent(Intent.ACTION_VIEW,
+                        Uri.parse("http://www.youtube.com/watch?v=" + key));
+                startActivity(intent);
+            }
+        }
+    }
+
+
     public class NetworkChangeReceiver extends BroadcastReceiver {
 
         @Override
@@ -249,6 +280,10 @@ public class MainActivity extends AppCompatActivity {
             Log.d(LOG_TAG, "Net work status is: " + status);
             if (!Constants.NET_STATUS_NOT_CONNECTED.equals(NetworkUtil.getConnectivityStatusString(context))) {
                 fetchData();
+//                if (rootView != null) {
+//                    TextView tv = (TextView) rootView.findViewById(R.id.tv_no_data);
+//                    tv.setText("");
+//                }
             }
         }
     }

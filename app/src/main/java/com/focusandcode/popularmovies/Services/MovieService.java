@@ -1,6 +1,6 @@
 package com.focusandcode.popularmovies.Services;
 
-import com.focusandcode.popularmovies.Constants;
+import com.focusandcode.popularmovies.utils.Constants;
 import com.focusandcode.popularmovies.Entities.ListMovieReviews;
 import com.focusandcode.popularmovies.Entities.ListMovieVideos;
 import com.focusandcode.popularmovies.Entities.ListMovies;

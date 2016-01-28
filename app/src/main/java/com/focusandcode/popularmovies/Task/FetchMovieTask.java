@@ -51,6 +51,7 @@ public class FetchMovieTask  extends AsyncTask<String, Void, List<Movie>> {
             spinnerView.setVisibility(View.GONE);
         }
         adapter.getMovies().addAll(results);
+        adapter.notifyDataSetChanged();
     }
 
     @Override

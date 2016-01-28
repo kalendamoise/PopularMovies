@@ -18,6 +18,7 @@ import android.widget.ImageView;
 import com.focusandcode.popularmovies.Entities.Movie;
 import com.focusandcode.popularmovies.Services.MovieService;
 import com.focusandcode.popularmovies.adapters.RestClient;
+import com.focusandcode.popularmovies.utils.Constants;
 import com.squareup.picasso.Picasso;
 
 import butterknife.Bind;
