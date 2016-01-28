@@ -74,9 +74,6 @@ public class MainActivity extends AppCompatActivity {
 
         setSupportActionBar(toolbar);
 
-
-
-
         if (findViewById(R.id.item_detail_container) != null) {
             // The detail container view will be present only in the
             // large-screen layouts (res/values-w900dp).
@@ -84,6 +81,22 @@ public class MainActivity extends AppCompatActivity {
             // activity should be in two-pane mode.
             twoPane = true;
             Log.d(LOG_TAG, "the twoPane is " + twoPane);
+
+            // load the first element in the detail view
+            if (movies != null && !movies.isEmpty()) {
+                Bundle arguments = new Bundle();
+                arguments.putParcelable(DetailActivityFragment.ARG_ITEM_ID, movies.get(0));
+                DetailActivityFragment fragment = new DetailActivityFragment();
+                fragment.setArguments(arguments);
+                if (getSupportFragmentManager().getFragments() != null) {
+                    getSupportFragmentManager().getFragments().remove(0);
+                }
+
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.item_detail_container, fragment)
+                        .addToBackStack(null)
+                        .commit();
+            }
         }
 
         assert recyclerView != null;
@@ -95,8 +108,6 @@ public class MainActivity extends AppCompatActivity {
             mLayoutManager.onRestoreInstanceState(state);
 
         }
-
-
         fetchData();
 
         // Stetho is a tool created by facebook to view your database in chrome inspect.
@@ -156,13 +167,11 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
 
 
-        EndlessScrollListener endlessScrollListener = new EndlessScrollListener() {
+        EndlessRecyclerOnScrollListener endlessScrollListener = new EndlessRecyclerOnScrollListener(mLayoutManager) {
             @Override
-            public boolean onLoadMore(int page, int totalItemsCount) {
-
+            public void onLoadMore(int page) {
+                Log.d(LOG_TAG, "EndlessScroll called");
                 fetchDataAppend(page);
-                // or customLoadMoreDataFromApi(totalItemsCount);
-                return true;
             }
         };
 
