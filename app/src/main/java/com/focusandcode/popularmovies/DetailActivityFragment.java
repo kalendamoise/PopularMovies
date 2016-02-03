@@ -339,7 +339,8 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
             movieReviews = data.getResults();
             for (int i = 0; i < movieReviews.size(); i++) {
                 MovieReview review = movieReviews.get(i);
-                reviewContainer.addView(buildReview(review));
+                if (reviewContainer != null)
+                    reviewContainer.addView(buildReview(review));
             }
         }
 
@@ -356,7 +357,8 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
             movieVideos = data.getResults();
             for (int i = 0; i < movieVideos.size(); i++) {
                 MovieVideo video = movieVideos.get(i);
-                videoContainer.addView(buildVideo(video));
+                if (videoContainer != null)
+                    videoContainer.addView(buildVideo(video));
             }
         }
 

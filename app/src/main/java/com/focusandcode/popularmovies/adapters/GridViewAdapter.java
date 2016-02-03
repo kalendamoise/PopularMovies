@@ -10,15 +10,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.focusandcode.popularmovies.utils.Constants;
 import com.focusandcode.popularmovies.DetailActivity;
 import com.focusandcode.popularmovies.DetailActivityFragment;
 import com.focusandcode.popularmovies.Entities.Movie;
 import com.focusandcode.popularmovies.R;
+import com.focusandcode.popularmovies.utils.Constants;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.Bind;
@@ -27,9 +29,11 @@ import butterknife.ButterKnife;
 /**
  * Created by Moise2022 on 9/25/15.
  */
-public class GridViewAdapter extends RecyclerView.Adapter<GridViewAdapter.ViewHolder> {
+public class GridViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static final String LOG_TAG = GridViewAdapter.class.getName();
-    private List<Movie> movies;
+    private final int VIEW_ITEM = 0;
+    private final int VIEW_PROG = 1;
+    private List<Movie> movies = new ArrayList<Movie>();
     private Context context;
     private boolean twoPane;
     private FragmentManager fragmentManager;
@@ -42,59 +46,84 @@ public class GridViewAdapter extends RecyclerView.Adapter<GridViewAdapter.ViewHo
         this.fragmentManager = fragmentManager;
     }
 
+
+
+
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.gridview_layout, parent, false);
-        return new ViewHolder(view);
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+//        View view = LayoutInflater.from(parent.getContext())
+//                .inflate(R.layout.gridview_layout, parent, false);
+//        return new ViewHolder(view);
+
+        RecyclerView.ViewHolder vh;
+        if (viewType == VIEW_ITEM) {
+            View v = LayoutInflater.from(parent.getContext()).inflate(
+                    R.layout.gridview_layout, parent, false);
+
+            vh = new ViewHolder(v);
+
+        } else {
+            View v = LayoutInflater.from(parent.getContext()).inflate(
+                    R.layout.progressbar_item, parent, false);
+
+            vh = new ProgressViewHolder(v);
+        }
+        Log.d(LOG_TAG, "View Type: " + viewType);
+        return vh;
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.movie = movies.get(position);
+    public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
+
+        if (holder instanceof GridViewAdapter.ViewHolder) {
+            final GridViewAdapter.ViewHolder viewHolder =(GridViewAdapter.ViewHolder) holder;
+            viewHolder.movie = movies.get(position);
 
 
-        StringBuilder builder = new StringBuilder();
-        builder.append(Constants.IMAGE_BASE_URL)
+            StringBuilder builder = new StringBuilder();
+            builder.append(Constants.IMAGE_BASE_URL)
                     .append(Constants.SEPARATOR)
                     .append(Constants.IMAGE_SIZE)
                     .append(Constants.SEPARATOR)
-                    .append(holder.movie.getPosterPath());
-        String uri = builder.toString();
+                    .append(viewHolder.movie.getPosterPath());
+            String uri = builder.toString();
 
 
-        Picasso.with(context)
-                        .load(uri)
-                        .placeholder(R.mipmap.ic_launcher)
-                        .error(R.mipmap.ic_launcher)
-                        .into(holder.image);
-        holder.imageTitle.setText(holder.movie.getTitle());
+            Picasso.with(context)
+                    .load(uri)
+                    .placeholder(R.mipmap.ic_launcher)
+                    .error(R.mipmap.ic_launcher)
+                    .into(viewHolder.image);
+            viewHolder.imageTitle.setText(viewHolder.movie.getTitle());
 
-        holder.mView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(LOG_TAG, "the twoPane is " + twoPane);
-                if (twoPane) {
-                    Bundle arguments = new Bundle();
-                    arguments.putParcelable(DetailActivityFragment.ARG_ITEM_ID, holder.movie );
-                    DetailActivityFragment fragment = new DetailActivityFragment();
-                    fragment.setArguments(arguments);
-                    if (fragmentManager.getFragments() != null) {
-                        fragmentManager.getFragments().remove(0);
+            viewHolder.mView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.d(LOG_TAG, "the twoPane is " + twoPane);
+                    if (twoPane) {
+                        Bundle arguments = new Bundle();
+                        arguments.putParcelable(DetailActivityFragment.ARG_ITEM_ID, viewHolder.movie);
+                        DetailActivityFragment fragment = new DetailActivityFragment();
+                        fragment.setArguments(arguments);
+                        if (fragmentManager.getFragments() != null) {
+                            fragmentManager.getFragments().remove(0);
+                        }
+
+                        fragmentManager.beginTransaction()
+                                .replace(R.id.item_detail_container, fragment)
+                                .addToBackStack(null)
+                                .commit();
+                    } else {
+                        Context context = v.getContext();
+                        Intent intent = new Intent(context, DetailActivity.class);
+                        intent.putExtra(DetailActivityFragment.ARG_ITEM_ID, viewHolder.movie);
+                        context.startActivity(intent);
                     }
-
-                    fragmentManager.beginTransaction()
-                            .replace(R.id.item_detail_container, fragment)
-                            .addToBackStack(null)
-                            .commit();
-                } else {
-                    Context context = v.getContext();
-                    Intent intent = new Intent(context, DetailActivity.class);
-                    intent.putExtra(DetailActivityFragment.ARG_ITEM_ID, holder.movie);
-                    context.startActivity(intent);
                 }
-            }
-        });
+            });
+        }else {
+            ((ProgressViewHolder) holder).progressBar.setIndeterminate(true);
+        }
 
     }
 
@@ -104,11 +133,14 @@ public class GridViewAdapter extends RecyclerView.Adapter<GridViewAdapter.ViewHo
     }
 
     public List<Movie> getMovies() {
+        if (movies == null) {
+            movies = new ArrayList<Movie>();
+        }
         return movies;
     }
 
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
         @Bind(R.id.title) TextView imageTitle;
         @Bind(R.id.imageView) ImageView image;
@@ -126,70 +158,12 @@ public class GridViewAdapter extends RecyclerView.Adapter<GridViewAdapter.ViewHo
         }
     }
 
-        /*ArrayAdapter<Movie> {
-    private static final String LOG_TAG = GridViewAdapter.class.getName();
+    public static class ProgressViewHolder extends RecyclerView.ViewHolder {
+        public ProgressBar progressBar;
 
-    private List<Movie> movies;
-    private Context context;
-    private int layoutResourceId;
-
-    public GridViewAdapter(Context context, int layoutResourceId, List<Movie> movies) {
-        super(context, layoutResourceId, movies);
-        this.context = context;
-        this.movies = movies;
-        this.layoutResourceId = layoutResourceId;
-    }
-
-
-    @Override
-    public View getView(int position, View row, ViewGroup parent) {
-
-        ViewHolder holder = null;
-
-        if (row == null) {
-            LayoutInflater inflater = LayoutInflater.from(context);
-            row = inflater.inflate(layoutResourceId, parent, false);
-            holder = new ViewHolder(row);
-            row.setTag(holder);
-        } else {
-            holder = (ViewHolder) row.getTag();
-        }
-
-        Movie movie = getItem(position);
-        if (movie != null) {
-            StringBuilder builder = new StringBuilder();
-            builder.append(Constants.IMAGE_BASE_URL)
-                    .append(Constants.SEPARATOR)
-                    .append(Constants.IMAGE_SIZE)
-                    .append(Constants.SEPARATOR)
-                    .append(movie.getPosterPath());
-            String uri = builder.toString();
-            if (holder.image != null) {
-                Picasso.with(context)
-                        .load(uri)
-                        .placeholder(R.mipmap.ic_launcher)
-                        .error(R.mipmap.ic_launcher)
-                        .into(holder.image);
-                holder.imageTitle.setText(movie.getTitle());
-            }
-        }
-
-        return row;
-    }
-
-
-    public List<Movie> getMovies() {
-        return movies;
-    }
-
-
-    static class ViewHolder  {
-        @Bind(R.id.title) TextView imageTitle;
-        @Bind(R.id.imageView) ImageView image;
-
-        public ViewHolder(View view) {
-            ButterKnife.bind(this, view);
+        public ProgressViewHolder(View v) {
+            super(v);
+            progressBar = (ProgressBar) v.findViewById(R.id.progressBar1);
         }
     }
-    */
 }

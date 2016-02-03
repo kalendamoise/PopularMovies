@@ -28,7 +28,7 @@
         app:layoutManager="LinearLayoutManager"
         tools:context="com.focusandcode.popularmovies.MainActivity"
         tools:listitem="@layout/gridview_layout"
-        android:layout_weight="0.71" />
+        android:layout_weight="1.70" />
 
     <FrameLayout
         android:id="@+id/item_detail_container"

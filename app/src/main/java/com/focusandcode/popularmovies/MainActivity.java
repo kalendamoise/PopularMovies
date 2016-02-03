@@ -5,8 +5,11 @@ import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -22,6 +25,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.focusandcode.popularmovies.Data.MoviesContract;
 import com.focusandcode.popularmovies.Entities.Movie;
@@ -51,9 +57,15 @@ public class MainActivity extends AppCompatActivity {
     Toolbar toolbar;
     @Bind(R.id.item_list)
     RecyclerView recyclerView;
+    @Bind(R.id.noData)
+    TextView tv;
+    @Bind(R.id.spinnerView)
+    LinearLayout spinnerView;
+
 
 
     private NetworkChangeReceiver broadcastReceiver = new NetworkChangeReceiver();
+    private View rootView;
 
 
     @Override
@@ -65,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        rootView= this.getCurrentFocus();
         ButterKnife.bind(this);
 
         if (savedInstanceState != null)
@@ -108,8 +121,17 @@ public class MainActivity extends AppCompatActivity {
             mLayoutManager.onRestoreInstanceState(state);
 
         }
-        fetchData();
 
+        if (Constants.NET_STATUS_NOT_CONNECTED.equals(NetworkUtil.getConnectivityStatusString(this)) && (movies.size() == 0)) {
+            tv.setText(getString(R.string.no_data));
+        }
+
+        if (!Constants.NET_STATUS_NOT_CONNECTED.equals(NetworkUtil.getConnectivityStatusString(this))) {
+            tv.setText("");
+            tv.setVisibility(View.GONE);
+        }
+
+        fetchData();
         // Stetho is a tool created by facebook to view your database in chrome inspect.
         // The code below integrates Stetho into your app. More information here:
         // http://facebook.github.io/stetho/
@@ -160,10 +182,17 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setHasFixedSize(true);
 
         // use a linear layout manager
-        mLayoutManager = new GridLayoutManager(this, 2);
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+            mLayoutManager = new GridLayoutManager(this, 2);
+        }
+        else{
+            mLayoutManager = new GridLayoutManager(this, 3);
+        }
+
+
         recyclerView.setLayoutManager(mLayoutManager);
 
-        adapter = new GridViewAdapter(this, new ArrayList<Movie>(), twoPane, this.getSupportFragmentManager());
+        adapter = new GridViewAdapter(this, movies, twoPane, this.getSupportFragmentManager());
         recyclerView.setAdapter(adapter);
 
 
@@ -196,6 +225,7 @@ public class MainActivity extends AppCompatActivity {
         adapter.getMovies().clear();
 
         if (sortOrder.equals("favorite")) {
+            spinnerView.setVisibility(View.GONE);
             setTitle("Favorite Movies");
             String orderBy = MoviesContract.MovieEntry.COLUMN_POPULARITY + " DESC";
             Cursor cursor = getContentResolver().query(MoviesContract.MovieEntry.CONTENT_URI, null, null, null, orderBy, null);
@@ -218,10 +248,13 @@ public class MainActivity extends AppCompatActivity {
                 adapter.getMovies().add(movie);
                 Log.d(LOG_TAG, movie.toString());
             }
+            if (cursor.getCount() == 0) {
+                Toast.makeText(this, "You have zero favorite movie. Please favorite movies and then come back to this view to see them.", Toast.LENGTH_LONG).show();
+            }
 
         }
         else {
-            FetchMovieTask task = new FetchMovieTask(adapter, null);
+            FetchMovieTask task = new FetchMovieTask(adapter, spinnerView);
             task.execute(sortOrder, Constants.API_KEY, String.valueOf(1));
         }
         adapter.notifyDataSetChanged();
@@ -245,9 +278,9 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (sortOrder.equals("favorite")) {
-            //spinnerView.setVisibility(View.INVISIBLE);
+            spinnerView.setVisibility(View.INVISIBLE);
         }else {
-            FetchMovieTask task = new FetchMovieTask(adapter, null);
+            FetchMovieTask task = new FetchMovieTask(adapter, spinnerView);
             task.execute(sortOrder, Constants.API_KEY, String.valueOf(page));
         }
         adapter.notifyDataSetChanged();
@@ -276,6 +309,23 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onPause() {
+        // Save ListView state @ onPause
+        Log.d(LOG_TAG, "saving listview state @ onPause");
+        unregisterReceiver(broadcastReceiver);
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(broadcastReceiver, intentFilter);
+    }
+
 
     public class NetworkChangeReceiver extends BroadcastReceiver {
 
@@ -288,11 +338,11 @@ public class MainActivity extends AppCompatActivity {
             //context.startActivity(shareIntent);
             Log.d(LOG_TAG, "Net work status is: " + status);
             if (!Constants.NET_STATUS_NOT_CONNECTED.equals(NetworkUtil.getConnectivityStatusString(context))) {
+                if (rootView != null) {
+                    tv.setText("");
+                    tv.setVisibility(TextView.GONE);
+                }
                 fetchData();
-//                if (rootView != null) {
-//                    TextView tv = (TextView) rootView.findViewById(R.id.tv_no_data);
-//                    tv.setText("");
-//                }
             }
         }
     }
