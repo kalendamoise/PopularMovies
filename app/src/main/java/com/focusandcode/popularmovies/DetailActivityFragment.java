@@ -59,6 +59,7 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     private Uri mUri = MoviesContract.MovieEntry.CONTENT_URI;
     private List<MovieReview> movieReviews = new ArrayList<MovieReview>();
     private List<MovieVideo> movieVideos = new ArrayList<MovieVideo>();
+    private ShareActionProvider mShareActionProvider;
 
 
     @Bind(R.id.reviews_container)
@@ -211,13 +212,13 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
         MenuItem menuItem = menu.findItem(R.id.action_share);
 
         // Get the provider and hold onto it to set/change the share intent.
-        ShareActionProvider mShareActionProvider =
+        mShareActionProvider =
                 (ShareActionProvider) MenuItemCompat.getActionProvider(menuItem);
 
         // Attach an intent to this ShareActionProvider.  You can update this at any time,
         // like when the user selects a new piece of data they might like to share.
         if (mShareActionProvider != null) {
-            mShareActionProvider.setShareIntent(createShareForecastIntent());
+            //mShareActionProvider.setShareIntent(createShareForecastIntent());
         } else {
             Log.d(LOG_TAG, "Share Action Provider is null?");
         }
@@ -234,7 +235,8 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
         //shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
         shareIntent.setType("text/plain");
         shareIntent.putExtra(Intent.EXTRA_TEXT,
-                "Title: " + movie.getTitle() + " -- Synopsis: " + movie.getOverview());
+                "Title: " + movie.getTitle() + " -- Synopsis: " + movie.getOverview()
+                        + " -- trailer: http://www.youtube.com/watch?v=" + movieVideos.get(0).getKey());
         return shareIntent;
     }
 
@@ -357,8 +359,14 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
             movieVideos = data.getResults();
             for (int i = 0; i < movieVideos.size(); i++) {
                 MovieVideo video = movieVideos.get(i);
-                if (videoContainer != null)
+                if (videoContainer != null) {
                     videoContainer.addView(buildVideo(video));
+                    if (i == 0) {
+                        if (mShareActionProvider != null) {
+                            mShareActionProvider.setShareIntent(createShareForecastIntent());
+                        }
+                    }
+                }
             }
         }
 
