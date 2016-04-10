@@ -21,6 +21,10 @@ android {
     lintOptions {
         abortOnError false
     }
+
+    buildTypes.each{
+        it.buildConfigField 'String', 'MOVIE_DB_API_KEY', MovieDbApiKey
+    }
 }
 
 repositories {

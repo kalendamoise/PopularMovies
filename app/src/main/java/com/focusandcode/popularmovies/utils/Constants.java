@@ -1,10 +1,12 @@
 package com.focusandcode.popularmovies.utils;
 
+import com.focusandcode.popularmovies.BuildConfig;
+
 /**
  * Created by Moise2022 on 9/24/15.
  */
 public class Constants {
-    public static final String API_KEY = "";
+    public static final String API_KEY = BuildConfig.MOVIE_DB_API_KEY;
     public static final String IMAGE_BASE_URL = "http://image.tmdb.org/t/p/";
     public static final String IMAGE_SIZE = "w185";
     public static final String NET_STATUS_NOT_CONNECTED = "Not connected to Internet";
