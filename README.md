@@ -2,7 +2,9 @@
 
 In order to successfully use this application you will need to generate your own API Key from https://www.themoviedb.org/documentation/api.
 
-Once you have your API Key, place it in your gradle.propreties file.
+Once you have your API Key, place it in your gradle.propreties file in project build dir or in gradle user home
+more detail about your build environment can be found at: https://docs.gradle.org/current/userguide/build_environment.html
+
 
 # Details 
 
