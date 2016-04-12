@@ -6,7 +6,7 @@ Once you have your API Key, place it in your
 ```shell
 gradle.propreties
 ```
-file in project build dir or in gradle user home
+file in your project build dir or in your gradle user home
 more detail about your build environment can be found [here]( https://docs.gradle.org/current/userguide/build_environment.html)
 
 
